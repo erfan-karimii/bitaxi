@@ -32,6 +32,9 @@ docker-compose -f docker-compose-dev.yaml up --build
 - نکته: برای مبلغ های بیشتر از یک میلیون تومان کارمزد 20 درصدی اعمال میشود
 - کیف پول داخلی -> شارژ شدن از سمت سامانه
 - نکته 2: سه سفر اول هر راننده بدون کارمزد میباشد.
+- کد تخفیف برای رویدادهای مختلف نوشته شود
+- سیستم لغو سفر: در صورت لغو سفر 50 درصد از هزینه سفر به عنوان جریمه از کاربر برداشت میشود
+- کیف پول داخلی -> شارژ کردن و خرید کردن
 
 ## <a name="database-design">Database design</a>
 after 4 years of programming,I can say this with confident that no databse design perfect unless they stay in payper!
