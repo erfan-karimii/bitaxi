@@ -59,4 +59,36 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class BaseProfile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.PROTECT)
+    first_name = models.CharField(max_length=254)
+    last_name = models.CharField(max_length=254)
+    cash_bank = models.IntegerField(default=0)
     
+    def __str__(self):
+        return self.user.email+ "//"+self.first_name+ "//" + self.last_name
+    
+    class Meta:
+        abstract = True
+
+class DriverProfile(BaseProfile):
+    CARS = (
+        ('SAMAND','SAMAND'),
+        ("PEUGEOT","PEUGEOT")
+    )
+    STATUS = (
+        ("traveling","traveling"),
+        ("No-travel","No-travel")
+    )
+    photo = models.ImageField()
+    car = models.CharField(choices=CARS,max_length=10)
+    count_trip = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(choices=STATUS,max_length=11)
+
+
+
+class CustomerProfile(BaseProfile):
+    pass
