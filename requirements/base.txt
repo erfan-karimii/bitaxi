@@ -7,3 +7,4 @@ python-decouple==3.8
 
 jdatetime==4.1.1
 
+drf_spectacular
