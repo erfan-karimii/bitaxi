@@ -70,7 +70,7 @@ class BaseProfile(models.Model):
     def __str__(self)-> str:
         return self.user.email+ "//"+self.first_name+ "//" + self.last_name
     
-
+    @property
     def full_name(self) -> str:
         return self.first_name +' '+ self.last_name
     

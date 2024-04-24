@@ -21,7 +21,7 @@ class Trips(models.Model):
 
 
     def __str__(self):
-        return self.driver.full_name() + "/"+ self.customer.full_name()
+        return self.driver.full_name + "/"+ self.customer.full_name()
     
 
 class DriverOffers(models.Model):

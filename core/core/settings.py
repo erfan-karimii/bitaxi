@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 LOCAL_APPS = [
     'account.apps.AccountConfig',
     'trips.apps.TripsConfig',
+    'payment.apps.PaymentConfig'
 ]
 
 THIRD_PARTY_APPS = [
