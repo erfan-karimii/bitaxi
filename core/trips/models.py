@@ -1,7 +1,6 @@
-from typing import Collection
 from django.db import models
 from account.models import DriverProfile,CustomerProfile
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class City(models.Model):
     name = models.CharField(max_length=45)
@@ -36,4 +35,14 @@ class DriverOffers(models.Model):
     def __str__(self):
         return self.driver.full_name + " " + self.origin+ " "+ self.destination
 
+class Comment(models.Model):
+    customer = models.ForeignKey(CustomerProfile,on_delete=models.PROTECT)
+    driver = models.ForeignKey(DriverProfile,on_delete=models.PROTECT)
+    trips = models.OneToOneField(Trips,on_delete=models.CASCADE)
+    text = models.TextField(null=True,blank=True)
+    score = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
+    created_at = models.DateTimeField(auto_now=True)
 
+
+    def __str__(self):
+        return self.customer.full_name + " "+ self.score
