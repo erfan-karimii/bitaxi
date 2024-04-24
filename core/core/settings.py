@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 LOCAL_APPS = [
     'account.apps.AccountConfig',
+    'trips.apps.TripsConfig',
 ]
 
 THIRD_PARTY_APPS = [

@@ -67,8 +67,12 @@ class BaseProfile(models.Model):
     last_name = models.CharField(max_length=254)
     cash_bank = models.IntegerField(default=0)
     
-    def __str__(self):
+    def __str__(self)-> str:
         return self.user.email+ "//"+self.first_name+ "//" + self.last_name
+    
+
+    def full_name(self) -> str:
+        return self.first_name +' '+ self.last_name
     
     class Meta:
         abstract = True
@@ -92,3 +96,5 @@ class DriverProfile(BaseProfile):
 
 class CustomerProfile(BaseProfile):
     pass
+
+
