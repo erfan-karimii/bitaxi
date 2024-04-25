@@ -6,15 +6,14 @@ from rest_framework import serializers
 
 
 
-class RegisterSerializers(serializers.ModelSerializer):
+class InputRegisterSerializers(serializers.ModelSerializer):
     password1 = serializers.CharField(max_length=250,write_only=True)
     class Meta:
         model = User
-        fields = ['email','password','password1']
+        fields = ['email','password','password1',]
 
 
     def validate(self, attrs):
-        user = attrs.get('email')
         if attrs.get('password') != attrs.get('password1'):
             raise ValidationError("Passowrd Does not same")
         
@@ -27,7 +26,7 @@ class RegisterSerializers(serializers.ModelSerializer):
     
 
 
-class AuthTokenSerializer(serializers.Serializer):
+class CustomAuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField(
         label=_("Email"),
     )
@@ -55,6 +54,10 @@ class AuthTokenSerializer(serializers.Serializer):
             # backend.)
             if not user:
                 msg = _('Unable to log in with provided credentials.')
+                raise serializers.ValidationError(msg, code='authorization')
+            
+            if not user.is_driver:
+                msg = _('You are Not Driver!')
                 raise serializers.ValidationError(msg, code='authorization')
         else:
             msg = _('Must include "username" and "password".')
