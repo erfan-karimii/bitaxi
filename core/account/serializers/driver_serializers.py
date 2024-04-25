@@ -1,13 +1,35 @@
+from account.models import User
 from django.contrib.auth import authenticate
+from rest_framework.validators import ValidationError
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework import serializers
+
+
+
+class RegisterSerializers(serializers.ModelSerializer):
+    password1 = serializers.CharField(max_length=250,write_only=True)
+    class Meta:
+        model = User
+        fields = ['email','password','password1']
+
+
+    def validate(self, attrs):
+        user = attrs.get('email')
+        if attrs.get('password') != attrs.get('password1'):
+            raise ValidationError("Passowrd Does not same")
+        
+
+        return super().validate(attrs)
+    
+    def create(self, validated_data):
+        validated_data.pop('password1',None)
+        return User.objects.create_user(**validated_data,is_driver=True)
+    
 
 
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField(
         label=_("Email"),
-        write_only=True
     )
     password = serializers.CharField(
         label=_("Password"),
