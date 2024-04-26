@@ -77,6 +77,7 @@ class BaseProfile(models.Model):
     class Meta:
         abstract = True
 
+
 class DriverProfile(BaseProfile):
     CARS = (
         ('SAMAND','SAMAND'),
