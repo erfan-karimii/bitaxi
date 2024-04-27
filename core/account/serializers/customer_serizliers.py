@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
+from account.models import User
+
 
 class CustomAuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField(
@@ -42,4 +44,16 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             raise serializers.ValidationError(msg, code='authorization')
 
         attrs['user'] = user
+        return attrs
+
+class RegisterCustomerSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField()
+    class Meta:
+        model = User
+        fields = ('email','password','password2')
+    
+    
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({'password':'first and second password did\'nt match'})
         return attrs
