@@ -65,3 +65,27 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+from django.contrib.auth.hashers import make_password
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True,max_length=250)
+    new_password1 = serializers.CharField(required=True,write_only=True)
+
+    def validate(self, attrs):
+        if attrs.get('new_password') != attrs.get('new_password1'):
+            raise ValidationError("Passowrd Does not same")
+        
+
+        return super().validate(attrs)
+    
+
+    def update(self,validated_data):
+        user = self.context['request'].user
+        user.set_password(validated_data['new_password'])
+        user.save()
+        return user
+    
+
+
+
+

@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from account.serializers.driver_serializers import InputRegisterSerializers,CustomAuthTokenSerializer
+from account.serializers.driver_serializers import InputRegisterSerializers,CustomAuthTokenSerializer,ResetPasswordSerializer
 from rest_framework import status,serializers
 from drf_spectacular.utils import extend_schema
 from account.models import User
@@ -38,3 +38,11 @@ class DriverLogin(ObtainAuthToken):
     
 
 # TODO : Reset Password
+from django.contrib.auth.hashers import make_password
+class ResetPassword(APIView):
+
+    def post(self,request):
+        serializers = ResetPasswordSerializer(data=request.data,context = {'request':request})
+        if serializers.is_valid():
+            serializers.update(serializers.validated_data)
+            return Response("Done")
