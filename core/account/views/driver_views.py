@@ -45,4 +45,5 @@ class ResetPassword(APIView):
         serializers = ResetPasswordSerializer(data=request.data,context = {'request':request})
         if serializers.is_valid():
             serializers.update(serializers.validated_data)
-            return Response("Done")
+            return Response({"msg":"Your Password Changed"},status=status.HTTP_202_ACCEPTED)
+        return Response(serializers.errors,)
