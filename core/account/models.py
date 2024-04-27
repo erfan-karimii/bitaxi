@@ -66,6 +66,8 @@ class BaseProfile(models.Model):
     first_name = models.CharField(max_length=254)
     last_name = models.CharField(max_length=254)
     cash_bank = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self)-> str:
         return self.user.email+ "//"+self.first_name+ "//" + self.last_name
@@ -90,7 +92,6 @@ class DriverProfile(BaseProfile):
     photo = models.ImageField()
     car = models.CharField(choices=CARS,max_length=10)
     count_trip = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now=True)
     status = models.CharField(choices=STATUS,max_length=11)
 
 

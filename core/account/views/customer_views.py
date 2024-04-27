@@ -31,8 +31,7 @@ class RegisterCustomerView(APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         password = serializer.validated_data.get('password')
-        user = User.objects.create_user(email=email,password=password,is_driver=True)
-        CustomerProfile.objects.create(user=user,first_name='',last_name='')
+        User.objects.create_user(email=email,password=password,is_customer=True)
         
         # serializer.validated_data.update({'is_driver':True})
         # serializer.save()
