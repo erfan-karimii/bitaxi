@@ -24,17 +24,17 @@ docker-compose -f docker-compose-dev.yaml up --build
 ```
 
 ## <a name="features">Features</a>
-- 10 درصد مبلغ اعلام شده از سمت رضایی به اپلیکیشن به عنوان کارمزد پرداخت میشود.
-- مسافرین می توانند به رضایی با ستاره و کامنت امتیاز بدهند . بعد از تایید مدریت نمایش داده میشود.
--  مسافرین می توانند ماشین مورد نظر خود را کرایه کنند.مثال: پراید و سمند به سمت تهران میروند .خانوم خردمندی ترجیه می دهد با سمند به سمت تهران بروند.
-- پرداختی به راننده بعد از اتمام سفر و دادن کد اتمام سفر از سمت مسافر به راننده انجام میشود.
-- پرداخت های تمام سفر های ان روز راننده در ساعت 12 شب یه حساب رانندگان بعداز کسر کارمزد ریخته میشود.
-- نکته: برای مبلغ های بیشتر از یک میلیون تومان کارمزد 20 درصدی اعمال میشود
-- کیف پول داخلی -> شارژ شدن از سمت سامانه
-- نکته 2: سه سفر اول هر راننده بدون کارمزد میباشد.
-- کد تخفیف برای رویدادهای مختلف نوشته شود
-- سیستم لغو سفر: در صورت لغو سفر 50 درصد از هزینه سفر به عنوان جریمه از کاربر برداشت میشود
-- کیف پول داخلی -> شارژ کردن و خرید کردن
+- 10% of the announced amount is paid to the application as a from drivers's side.
+- A 20% fee is applied for amounts greater than one million Tomans
+- The first three trips of each driver are free of charge.
+- Travelers can rate driver's with stars and comments. It will be displayed after admin approval.
+-  Passengers can rent the car of their choice. Example: Pride and Samand are going to Tehran.Mr Karimi prefers to go to Tehran with Samand.
+- Payment to the driver is made after the completion of the trip and giving the completion code from the passenger to the driver.
+- Payments for all the driver's trips that day will be deposited into the driver's account at 12:00 PM after deducting the fee.
+- Internal wallet -> charging from the system side
+- Internal wallet -> top up and shop
+- Write a discount code for different events
+- Trip cancellation system: In case of trip cancellation, 50% of the trip cost will be charged as a fine from the user
 
 ## <a name="database-design">Database design</a>
 after 4 years of programming,I can say this with confident that no databse design perfect unless they stay in payper!
