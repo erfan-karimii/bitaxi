@@ -9,7 +9,7 @@ from account.serializers.driver_serializers import (
 from rest_framework import status,serializers
 from drf_spectacular.utils import extend_schema
 from account.models import User
-
+import uuid
 
 class DriverSignUP(APIView):
     class OutputRegisterSerializers(serializers.Serializer):
@@ -56,28 +56,39 @@ class ForgetPassword(APIView):
 
     @staticmethod
     def send_email(token):
+        # Our Emails content
         print(f'127.0.0.1:8000/custom/{token}/')
     
     def post(self,request):
         serializer = ForgetPasswordSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                email = serializer.data.get('email')
-                user=User.objects.get(email__exact=email)
-                self.send_email(user.auth_token)
-                return Response(serializer.data,status=status.HTTP_200_OK)
-            except:
-                return Response({"msg":"Email Does Not exist"})
+            email = serializer.data.get('email')
+            
+            if User.objects.filter(email=email).exists():
+                user = User.objects.get(email=email)
+                token, created = Token.objects.get_or_create(user=user)
+            else:
+                return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data,status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors)
     
 
+
 class VerifyForgetPassword(APIView):
+    class SerializerVerifyForgetPasswordOutPut(serializers.Serializer):
+        token = serializers.CharField(read_only=True)
     def post(self,request,token):
-        try:
-            my_token=Token.objects.get(key=token)
-            user=my_token.user
-            print(user)
-        except:
-            pass
+        if Token.objects.filter(key=token).exists():
+            token = Token.objects.get(key=token)
+            response = {
+                'token':token.key
+            }
+            return Response(response,status=status.HTTP_200_OK)
+        else:
+            return Response({"msg":"time error"},status=status.HTTP_400_BAD_REQUEST)
+        
+
+        
+    
 
