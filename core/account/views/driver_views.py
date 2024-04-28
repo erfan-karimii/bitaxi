@@ -2,7 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from account.serializers.driver_serializers import InputRegisterSerializers,CustomAuthTokenSerializer,ResetPasswordSerializer
+from account.serializers.driver_serializers import (
+    InputRegisterSerializers,CustomAuthTokenSerializer,ResetPasswordSerializer,
+    ForgetPasswordSerializer
+    )
 from rest_framework import status,serializers
 from drf_spectacular.utils import extend_schema
 from account.models import User
@@ -41,9 +44,40 @@ class DriverLogin(ObtainAuthToken):
 from django.contrib.auth.hashers import make_password
 class ResetPassword(APIView):
 
-    def post(self,request):
-        serializers = ResetPasswordSerializer(data=request.data,context = {'request':request})
-        if serializers.is_valid():
-            serializers.update(serializers.validated_data)
+    def put(self,request):
+        serializer = ResetPasswordSerializer(data=request.data,context ={'request':request})
+        if serializer.is_valid():
+            serializer.update(serializer.validated_data)
             return Response({"msg":"Your Password Changed"},status=status.HTTP_202_ACCEPTED)
-        return Response(serializers.errors,)
+        return Response(serializer.errors,)
+
+
+class ForgetPassword(APIView):
+
+    @staticmethod
+    def send_email(token):
+        print(f'127.0.0.1:8000/custom/{token}/')
+    
+    def post(self,request):
+        serializer = ForgetPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                email = serializer.data.get('email')
+                user=User.objects.get(email__exact=email)
+                self.send_email(user.auth_token)
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            except:
+                return Response({"msg":"Email Does Not exist"})
+        else:
+            return Response(serializer.errors)
+    
+
+class VerifyForgetPassword(APIView):
+    def post(self,request,token):
+        try:
+            my_token=Token.objects.get(key=token)
+            user=my_token.user
+            print(user)
+        except:
+            pass
+

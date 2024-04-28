@@ -10,5 +10,6 @@ urlpatterns = [
     path('reset_password/',driver_views.ResetPassword.as_view(),name='reset_password'),
     path('api-token-auth/',CustomCustomerAuthToken.as_view(),name='create-user-token'),
     path('register-user/',RegisterCustomerView.as_view(),name='register-user-view'),
-    
+    path('forget-password/',driver_views.ForgetPassword.as_view(),name='forget_password'),
+    path('custom/<token>/',driver_views.VerifyForgetPassword.as_view(),name='vrify')
 ]

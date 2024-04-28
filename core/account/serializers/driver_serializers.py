@@ -66,7 +66,6 @@ class CustomAuthTokenSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
-from django.contrib.auth.hashers import make_password
 class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True,max_length=250)
     new_password1 = serializers.CharField(required=True,write_only=True)
@@ -86,6 +85,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         return user
     
 
-
+class ForgetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=254)
 
 
