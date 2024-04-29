@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from drf_spectacular.utils import extend_schema
-
+from account.permissions import IsCustomer
 from account.serializers.customer_serizliers import CustomAuthTokenSerializer , RegisterCustomerSerializer
 from account.models import CustomerProfile , User
 
@@ -23,15 +23,15 @@ class CustomCustomerAuthToken(ObtainAuthToken):
             'email': user.email
         })
 
-
 class RegisterCustomerView(APIView):
+    permission_classes = [IsCustomer,]
     @extend_schema(request=RegisterCustomerSerializer)
     def post(self,request):
         serializer =  RegisterCustomerSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         password = serializer.validated_data.get('password')
-        User.objects.create_user(email=email,password=password,is_customer=True)
+        User.objects.create_user(email=email,password=password,is_customer=True) # Masoud --> password=password? setpassowrd()???
         
         # serializer.validated_data.update({'is_driver':True})
         # serializer.save()
