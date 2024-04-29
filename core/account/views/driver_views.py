@@ -40,8 +40,6 @@ class DriverLogin(ObtainAuthToken):
         return Response({'token': token.key,'email':user.email})
     
 
-# TODO : Reset Password
-from django.contrib.auth.hashers import make_password
 class ResetPassword(APIView):
 
     def put(self,request):
@@ -67,22 +65,23 @@ class ForgetPassword(APIView):
             if User.objects.filter(email=email).exists():
                 user = User.objects.get(email=email)
                 token, created = Token.objects.get_or_create(user=user)
+                return Response(serializer.data,status=status.HTTP_200_OK)
             else:
                 return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)
-            return Response(serializer.data,status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors)
-    
 
 
 class VerifyForgetPassword(APIView):
     class SerializerVerifyForgetPasswordOutPut(serializers.Serializer):
         token = serializers.CharField(read_only=True)
+        msg = serializers.CharField(read_only=True)
     def post(self,request,token):
         if Token.objects.filter(key=token).exists():
             token = Token.objects.get(key=token)
             response = {
-                'token':token.key
+                'token':token.key,
+                'msg':"success fully return"
             }
             return Response(response,status=status.HTTP_200_OK)
         else:
