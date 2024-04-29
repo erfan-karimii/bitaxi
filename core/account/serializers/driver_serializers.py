@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework.validators import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-
+from account.models import DriverProfile
 
 
 class InputRegisterSerializers(serializers.ModelSerializer):
@@ -89,3 +89,25 @@ class ForgetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254)
 
 
+class DriverProfileSerializers(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+    class Meta:
+        model = DriverProfile
+        exclude = ['status','id','created_at','updated_at','user']
+        # fields = "__all__"
+
+
+    def get_email(self, obj):
+        return obj.user.email
+    
+    def update(self,instance,validated_data):
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.cash_bank = validated_data.get('cash_bank', instance.cash_bank)
+        instance.photo = validated_data.get('photo', instance.photo)
+        instance.car = validated_data.get('car', instance.car)
+        instance.count_trip = validated_data.get('count_trip', instance.count_trip)
+        
+        instance.save()
+        
+        return instance

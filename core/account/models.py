@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+
 # Create your models here.
 class UserManager(BaseUserManager):
 
@@ -98,5 +99,6 @@ class DriverProfile(BaseProfile):
 
 class CustomerProfile(BaseProfile):
     pass
+
 
 

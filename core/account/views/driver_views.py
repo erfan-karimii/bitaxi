@@ -4,12 +4,12 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from account.serializers.driver_serializers import (
     InputRegisterSerializers,CustomAuthTokenSerializer,ResetPasswordSerializer,
-    ForgetPasswordSerializer
+    ForgetPasswordSerializer,DriverProfileSerializers
     )
 from rest_framework import status,serializers
 from drf_spectacular.utils import extend_schema
-from account.models import User
-import uuid
+from account.models import User,DriverProfile
+from account.permissions import IsDriver
 
 class DriverSignUP(APIView):
     class OutputRegisterSerializers(serializers.Serializer):
@@ -91,3 +91,19 @@ class VerifyForgetPassword(APIView):
         
     
 
+class DriverProfileView(APIView):
+    permission_classes=[IsDriver,]
+    def get(self,request):
+        profile = DriverProfile.objects.get(user=request.user)
+        serializer = DriverProfileSerializers(profile)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+    def put(self,request):
+        profile = DriverProfile.objects.get(user=request.user)
+        serializer = DriverProfileSerializers(profile,data=request.data)
+        if serializer.is_valid():
+            serializer.update(instance=profile,validated_data=serializer.validated_data)
+            return Response({"msg":"your update success"},status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
