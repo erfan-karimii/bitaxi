@@ -2,13 +2,14 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status , serializers
 from drf_spectacular.utils import extend_schema
 
-from account.serializers.customer_serizliers import CustomAuthTokenSerializer , RegisterCustomerSerializer
+from account.serializers.customer_serizliers import CustomAuthTokenSerializer , RegisterCustomerSerializer , CustomerResetPasswordSerializer,CustomerProfileSerializers
 from account.models import CustomerProfile , User
+from account.permissions import IsCustomer
 
-class CustomCustomerAuthToken(ObtainAuthToken):
+class CustomerLogin(ObtainAuthToken):
     serializer_class = CustomAuthTokenSerializer
     
     @extend_schema(responses=CustomAuthTokenSerializer)
@@ -36,4 +37,73 @@ class RegisterCustomerView(APIView):
         # serializer.validated_data.update({'is_driver':True})
         # serializer.save()
         return Response({'created':f'user with {email} email address created'},status=status.HTTP_201_CREATED)
+
+
+class CustomerResetPassword(APIView):
+    class OutputSerializer(serializers.Serializer):
+        msg = serializers.CharField()
+    
+    @extend_schema(request=CustomerResetPasswordSerializer,responses=OutputSerializer)
+    def patch(self,request):
+        user = request.user
+        serializer = CustomerResetPasswordSerializer(data=request.data,context={'user':user})
+        serializer.is_valid(raise_exception=True)
+        password = serializer.validated_data.get('new_password')
+        user.set_password(password)
+        user.save()
+        return Response({"msg":"User password updated successfully"})
         
+
+class CustomerForgetPassword(APIView):
+    class InputSerializer(serializers.Serializer):
+        email = serializers.EmailField(max_length=254)
+    
+    @staticmethod
+    def send_email(token):
+        # Our Emails content
+        print(f'127.0.0.1:8000/custom/{token}/')
+
+    
+    @extend_schema(request=InputSerializer)
+    def post(self,request):
+        serializer = self.InputSerializer(data=request.data)
+        if serializer.is_valid():    
+            email = serializer.validated_data.get('email')
+            if User.objects.filter(email=email).exists():
+                user = User.objects.get(email=email)
+                token, created = Token.objects.get_or_create(user=user)
+                self.send_email(token)
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            else:
+                return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors)    
+
+
+class CustomerVerifyForgetPassword(APIView):
+    class OutputSerializer(serializers.Serializer):
+        token = serializers.CharField(read_only=True)
+        msg = serializers.CharField(read_only=True)
+        
+    @extend_schema(responses=OutputSerializer)
+    def post(self,request,token):
+        if Token.objects.filter(key=token).exists():
+            token = Token.objects.get(key=token)
+            response = {
+                'token':token.key,
+                'msg':"success fully return"
+            }
+            return Response(response,status=status.HTTP_200_OK)
+        else:
+            return Response({"msg":"time error"},status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerProfileView(APIView):
+    permission_classes=[IsCustomer,]
+    def get(self,request):
+        profile = CustomerProfile.objects.get(user=request.user)
+        serializer = CustomerProfileSerializers(profile)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def patch(self,request):
+        pass

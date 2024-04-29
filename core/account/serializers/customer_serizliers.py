@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
-from account.models import User
+from account.models import User , CustomerProfile
 
 
 class CustomAuthTokenSerializer(serializers.Serializer):
@@ -46,6 +46,7 @@ class CustomAuthTokenSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
+
 class RegisterCustomerSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField()
     class Meta:
@@ -57,3 +58,22 @@ class RegisterCustomerSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({'password':'first and second password did\'nt match'})
         return attrs
+
+
+class CustomerResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True,max_length=250)
+    new_password1 = serializers.CharField(required=True,write_only=True)
+
+    def validate(self, attrs):
+        if self.context['user'].is_anonymous :
+            raise serializers.ValidationError("Login Required")
+        if attrs.get('new_password') != attrs.get('new_password1'):
+            raise serializers.ValidationError("Passowrd Does not same")
+        
+        return super().validate(attrs)
+    
+
+class CustomerProfileSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerProfile
+        fields = ["first_name","last_name","cash_bank"]

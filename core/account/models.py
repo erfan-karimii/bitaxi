@@ -90,7 +90,7 @@ class DriverProfile(BaseProfile):
         ("traveling","traveling"),
         ("No-travel","No-travel")
     )
-    photo = models.ImageField()
+    photo = models.Field()
     car = models.CharField(choices=CARS,max_length=10)
     count_trip = models.PositiveIntegerField(default=0)
     status = models.CharField(choices=STATUS,max_length=11)
