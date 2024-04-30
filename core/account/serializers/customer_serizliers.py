@@ -55,17 +55,17 @@ class RegisterCustomerSerializer(serializers.ModelSerializer):
     
     
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
+        if attrs.get('password') != attrs.get('password2'):
             raise serializers.ValidationError({'password':'first and second password did\'nt match'})
-        return attrs
+        return super().validate(attrs)
 
 
 class CustomerResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True,max_length=250)
-    new_password1 = serializers.CharField(required=True,write_only=True)
+    new_password2 = serializers.CharField(required=True,write_only=True,max_length=250)
 
     def validate(self, attrs):
-        if attrs.get('new_password') != attrs.get('new_password1'):
+        if attrs.get('new_password') != attrs.get('new_password2'):
             raise serializers.ValidationError("Passowrd Does not same")
         
         return super().validate(attrs)
