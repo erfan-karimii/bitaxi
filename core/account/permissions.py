@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-class IsCustomer(permissions.BasePermission):
+class IsAuthenticatedCustomer(permissions.BasePermission):
     """
     permission check for if user is valid customer or not.
     """

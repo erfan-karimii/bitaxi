@@ -65,8 +65,6 @@ class CustomerResetPasswordSerializer(serializers.Serializer):
     new_password1 = serializers.CharField(required=True,write_only=True)
 
     def validate(self, attrs):
-        if self.context['user'].is_anonymous :
-            raise serializers.ValidationError("Login Required")
         if attrs.get('new_password') != attrs.get('new_password1'):
             raise serializers.ValidationError("Passowrd Does not same")
         
@@ -77,3 +75,9 @@ class CustomerProfileSerializers(serializers.ModelSerializer):
     class Meta:
         model = CustomerProfile
         fields = ["first_name","last_name","cash_bank"]
+
+
+class CustomerProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerProfile
+        fields = ["first_name","last_name"]
