@@ -1,16 +1,17 @@
-from rest_framework.test import APITestCase , DjangoRequestFactory
 from unittest import mock
+
+from rest_framework.test import APITestCase , DjangoRequestFactory
+from model_bakery import baker
 
 from account.permissions import IsAuthenticatedCustomer
 from account.models import User
-from model_bakery import baker
 
 class TestIsAuthenticatedCustomerPermission(APITestCase):
     def setUp(self) -> None:
         self.mock_request = mock.Mock(spec=DjangoRequestFactory)
     
     def test_customer_access(self):
-        customer_user = baker.make(User,is_customer=True)
+        customer_user = baker.make(User,is_customer=True,is_verified=True)
         self.mock_request.user = customer_user
         permission_instance = IsAuthenticatedCustomer()
         

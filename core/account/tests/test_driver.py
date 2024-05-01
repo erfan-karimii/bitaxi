@@ -21,13 +21,13 @@ class IsDriverPermissionTestCase(TestCase):
         self.permission = IsDriver()
 
     def test_driver_permission(self):
-        urls=self.factory.get(reverse('driverprofile'))
+        urls=self.factory.get(reverse('account:driverprofile'))
         urls.user = self.user1
 
         self.assertTrue(self.permission.has_permission(urls, self.view))
 
     def test_no_driver(self):
-        urls = self.factory.get(reverse('driverprofile'))
+        urls = self.factory.get(reverse('account:driverprofile'))
         urls.user = self.user2
         self.assertFalse(self.permission.has_permission(urls,self.view))
 
@@ -49,7 +49,7 @@ class InputRegisterSerializersTest(TestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_password_not_same(self):
-        data = {'email':"admin@admin.com","password":"12","password1":"3"}
+        data = {'email':"admin@admin.com","password":"12","password1":"12"}
         serializers = InputRegisterSerializers()
 
         with self.assertRaises(ValidationError) as context:
@@ -71,7 +71,7 @@ class TestDriverSignUp(TestCase):
     def setUp(self):
         self.valid_data = {'email':"admin@admin.com","password":"12","password1":"12"}
         self.un_valid = {'email':"admin@admin.com","password":"122","password1":"12"}
-        self.url = reverse('DriverSignUP')
+        self.url = reverse('account:DriverSignUP')
     
     def test_valid_driver_signup(self):
 
@@ -94,7 +94,7 @@ class TestDriverSignIn(TestCase):
     def setUp(self):
         User.objects.create_user(email='index@gmail.com', password='password123',is_driver=True)
         User.objects.create_user(email='customer@gmail.com', password='password123',is_driver=False)
-        self.url = reverse("DriverSignIn")
+        self.url = reverse("account:DriverSignIn")
     
     def test_valid_login(self):
         data = {"email":'index@gmail.com', "password":'password123'}
@@ -119,7 +119,7 @@ class ResetPasswordTest(APITestCase):
     def setUp(self):
         self.user=User.objects.create_user(email='index@gmail.com', password='password123@',is_driver=True)
         self.token = Token.objects.create(user=self.user)
-        self.url = reverse("reset_password")
+        self.url = reverse("account:reset_password")
     
     def test_valid_reset_password(self):
         data = {"new_password": 'password1234', 'new_password1': 'password1234'}

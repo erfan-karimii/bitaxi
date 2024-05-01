@@ -9,7 +9,7 @@ from account.serializers.customer_serizliers import CustomAuthTokenSerializer , 
 from account.models import CustomerProfile , User
 from account.permissions import IsAuthenticatedCustomer
 
-class CustomerLogin(ObtainAuthToken):
+class CustomerLoginView(ObtainAuthToken):
     serializer_class = CustomAuthTokenSerializer
     
     @extend_schema(responses=CustomAuthTokenSerializer)
@@ -39,7 +39,7 @@ class RegisterCustomerView(APIView):
         return Response({'created':f'user with {email} email address created'},status=status.HTTP_201_CREATED)
 
 
-class CustomerResetPassword(APIView):
+class CustomerResetPasswordView(APIView):
     class OutputSerializer(serializers.Serializer):
         msg = serializers.CharField()
     
@@ -54,7 +54,7 @@ class CustomerResetPassword(APIView):
         return Response({"msg":"User password updated successfully"})
         
 
-class CustomerForgetPassword(APIView):
+class CustomerForgetPasswordView(APIView):
     class InputSerializer(serializers.Serializer):
         email = serializers.EmailField(max_length=254)
     
@@ -78,7 +78,7 @@ class CustomerForgetPassword(APIView):
             return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)   
 
 
-class CustomerVerifyForgetPassword(APIView):
+class CustomerVerifyForgetPasswordView(APIView):
     class OutputSerializer(serializers.Serializer):
         token = serializers.CharField(read_only=True)
         msg = serializers.CharField(read_only=True)
@@ -110,5 +110,6 @@ class CustomerProfileView(APIView):
         profile = CustomerProfile.objects.filter(user=request.user)
         profile.update(**serializer.validated_data)
         return Response({"msg":"profile update successfully"},status=status.HTTP_202_ACCEPTED)
+
         
         
