@@ -49,7 +49,7 @@ class InputRegisterSerializersTest(TestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_password_not_same(self):
-        data = {'email':"admin@admin.com","password":"12","password1":"12"}
+        data = {'email':"admin@admin.com","password":"12","password1":"3"}
         serializers = InputRegisterSerializers()
 
         with self.assertRaises(ValidationError) as context:
