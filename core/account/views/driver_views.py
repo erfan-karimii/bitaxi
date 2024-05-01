@@ -24,13 +24,14 @@ class DriverSignUP(APIView):
             response = {"email":serializers.data['email'],"message":"اکانت شما با موفقیت ساخته شد",}
             return Response(response, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializers.errors)
+            return Response(serializers.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 
 
 
 class DriverLogin(ObtainAuthToken):
+
     @extend_schema(request=CustomAuthTokenSerializer,responses=CustomAuthTokenSerializer)
     def post(self, request, *args, **kwargs):
         serializer = CustomAuthTokenSerializer(data=request.data)
@@ -41,13 +42,13 @@ class DriverLogin(ObtainAuthToken):
     
 
 class ResetPassword(APIView):
-
+    permission_classes = [IsDriver,]
     def put(self,request):
         serializer = ResetPasswordSerializer(data=request.data,context ={'request':request})
         if serializer.is_valid():
             serializer.update(serializer.validated_data)
             return Response({"msg":"Your Password Changed"},status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors,)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 class ForgetPassword(APIView):
