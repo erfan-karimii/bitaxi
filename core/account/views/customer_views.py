@@ -40,6 +40,7 @@ class RegisterCustomerView(APIView):
 
 
 class CustomerResetPasswordView(APIView):
+    permission_classes = [IsAuthenticatedCustomer]
     class OutputSerializer(serializers.Serializer):
         msg = serializers.CharField()
     
@@ -51,7 +52,7 @@ class CustomerResetPasswordView(APIView):
         password = serializer.validated_data.get('new_password')
         user.set_password(password)
         user.save()
-        return Response({"msg":"User password updated successfully"})
+        return Response({"msg":"User password updated successfully"},status=status.HTTP_202_ACCEPTED)
         
 
 class CustomerForgetPasswordView(APIView):

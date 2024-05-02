@@ -6,7 +6,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from model_bakery import baker
 
-from account.views.customer_views import CustomerLoginView, RegisterCustomerView, CustomerResetPasswordView, CustomerForgetPasswordView, CustomerVerifyForgetPasswordView, CustomerProfileView
 from account.models import User
 
 class TestCustomerLoginView(APITestCase):
@@ -35,9 +34,6 @@ class TestCustomerLoginView(APITestCase):
         
     
 
-        
-    
-
 class TestRegisterCustomerView(APITestCase):
     def setUp(self):
         self.valid_data = {'email':"admin@admin.com","password":"12","password2":"12"}
@@ -58,6 +54,38 @@ class TestRegisterCustomerView(APITestCase):
     
     
         
+class TestCustomerResetPasswordView(APITestCase):
+    def setUp(self) -> None:
+        self.customer = User.objects.create_user(email='test@test.com', password='1',is_customer=True)
+        self.token = Token.objects.create(user=self.customer)
+        self.password1 = "1"
+        self.password2 = "2"
+        self.url = reverse("account:customer_reset_password")
+        self.client = APIClient()
+
+    
+    def test_match_password(self):
+        data = {
+            "new_password" : self.password1,
+            "new_password2" : self.password1
+        }
+        headers = {'Authorization': f'Token {self.token.key}'}
+        response = self.client.patch(self.url,data,headers=headers)
         
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED)
+        self.assertEqual(response.data.get("msg"),"User password updated successfully")
     
-    
+    def test_unmatch_password(self):
+        data = {
+            "new_password" : self.password1,
+            "new_password2" : self.password2
+        }
+        headers = {'Authorization': f'Token {self.token.key}'}
+        response = self.client.patch(self.url,data,headers=headers)
+        print(response.data)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        # self.assert
+        # self.assertEqual(response.data.get("msg"),"User password updated successfully")
+        
+        
+        

@@ -140,5 +140,32 @@ class ResetPasswordTest(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
 
 
+
+class ForgetPasswordTest(APITestCase):
+    def setUp(self):
+        self.user=User.objects.create_user(email='index@gmail.com', password='password123@',is_driver=True)
+        self.url = reverse('account:forget_password')
     
+    def test_valid_data(self):
+        data = {"email":"index@gmail.com"}
+        response=self.client.post(self.url,data=data)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertIn(data['email'],str(response.content))
+        
+    def test_unvalid_data(self):
+        data = {"email":12}
+        response=self.client.post(self.url,data=data)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Enter valid email",str(response.content))
+        
+    def test_unvalid_data_email_does_not_exists(self):
+        data = {"email":"masoud@gamil.com"}
+        response = self.client.post(self.url,data=data)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Email Does Not exist",str(response.content))
+        
+
+class VerifyForgetPasswordTest(APITestCase):
+    def setUp(self):
+        pass
 # --------------------------Views ---------------------------------------

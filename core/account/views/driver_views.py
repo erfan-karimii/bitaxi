@@ -70,7 +70,7 @@ class ForgetPassword(APIView):
             else:
                 return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors)
+            return Response({"msg":"Enter valid email"},status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyForgetPassword(APIView):
