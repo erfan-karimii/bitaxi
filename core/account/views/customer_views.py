@@ -9,6 +9,10 @@ from account.serializers.customer_serizliers import CustomAuthTokenSerializer , 
 from account.models import CustomerProfile , User
 from account.permissions import IsAuthenticatedCustomer
 
+from utils.loggers import general_logger
+
+
+
 class CustomerLoginView(ObtainAuthToken):
     serializer_class = CustomAuthTokenSerializer
     
@@ -19,6 +23,7 @@ class CustomerLoginView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, _ = Token.objects.get_or_create(user=user)
+        general_logger.info("a user created")
         return Response({
             'token': token.key,
             'email': user.email

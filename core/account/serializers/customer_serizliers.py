@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from account.models import User , CustomerProfile
+from utils.loggers import error_logger
 
 
 class CustomAuthTokenSerializer(serializers.Serializer):
@@ -34,9 +35,11 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             # backend.)
             if not user:
                 msg = _('Unable to log in with provided credentials.')
+                error_logger.error(msg)
                 raise serializers.ValidationError(msg, code='authorization')
             
             if not user.is_customer:
+                error_logger.error(msg)
                 msg = _('User is Not Valid Customer.')
                 raise serializers.ValidationError(msg, code='authorization')
         else:
