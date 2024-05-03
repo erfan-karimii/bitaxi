@@ -204,6 +204,8 @@ LOGGING = {
 }
 
 if sys.argv[1:2] == ['test']:
+    import logging
+    logging.disable(logging.CRITICAL)
     ALLOWED_HOSTS = ['*']
     DEBUG = False
     STORAGES = {
