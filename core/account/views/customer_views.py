@@ -74,7 +74,7 @@ class CustomerForgetPasswordView(APIView):
             user = User.objects.get(email=email)
             token, created = Token.objects.get_or_create(user=user)
             self.send_email(token)
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            return Response({"msg":"recovery email send successfully"},status=status.HTTP_200_OK)
         else:
             return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)   
 
