@@ -153,3 +153,16 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+import sys
+
+if sys.argv[1:2] == ['test']:
+    ALLOWED_HOSTS = ['*']
+    DEBUG = False
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.memory.InMemoryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }

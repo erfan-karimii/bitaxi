@@ -1,14 +1,16 @@
+from io import BytesIO
 from django.test import TestCase
-from account.models import User
+from account.models import User,DriverProfile
 from django.test.client import RequestFactory
 from account.permissions import IsDriver
 from account.views.driver_views import DriverProfileView
 from django.urls import reverse
-from account.serializers.driver_serializers import InputRegisterSerializers
+from account.serializers.driver_serializers import InputRegisterSerializers,DriverProfileSerializers
 from rest_framework.validators import ValidationError
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, force_authenticate
+from model_bakery import baker
 
 # Permission
 
@@ -61,6 +63,39 @@ class InputRegisterSerializersTest(TestCase):
         data = {'email':"admin@admin.com","password":"12","password1":"12"}
         serializer = InputRegisterSerializers()
         self.assertEqual(serializer.validate(attrs=data),data)
+
+
+class DriverProfileSerializersTest(APITestCase):
+    def setUp(self):
+        self.user=User.objects.create_user(email='index@gmail.com', password='password123@',is_driver=True)
+        self.token = Token.objects.create(user=self.user)
+        self.profile = DriverProfile.objects.get(user=self.user)
+        self.url = reverse('account:driverprofile')
+        self.headers = {'Authorization': f'Token {self.token.key}'}
+
+
+    def test_get_email(self):
+        cl_obj = DriverProfileSerializers()
+        self.assertEqual(cl_obj.get_email(obj=self.profile),"index@gmail.com")
+    
+    def test_update_profile(self):
+        img = BytesIO(
+            b"GIF89a\x01\x00\x01\x00\x00\x00\x00!\xf9\x04\x01\x00\x00\x00"
+            b"\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x01\x00\x00"
+        )
+        img.name = "myimage.jpg"
+        data = {"first_name":"Masoud","last_name":"kheradmandi","image":img,"cash_bank":12,"car":"SAMAND","count_trip":12}
+        self.client.put(self.url,data=data,headers=self.headers)
+        self.profile.refresh_from_db()
+
+        self.assertEqual(self.profile.first_name,'Masoud')
+        self.assertEqual(self.profile.last_name,'kheradmandi')
+        self.assertEqual(self.profile.image,img)
+        self.assertEqual(self.profile.cash_bank,12)
+        self.assertEqual(self.profile.car,'SAMAND')
+        self.assertEqual(self.profile.count_trip,12)
+
+
 
 # ------------------------- Serializers ------------------------------
 
@@ -167,5 +202,55 @@ class ForgetPasswordTest(APITestCase):
 
 class VerifyForgetPasswordTest(APITestCase):
     def setUp(self):
-        pass
+        self.user=User.objects.create_user(email='index@gmail.com', password='password123@',is_driver=True)
+        self.token = Token.objects.create(user=self.user)
+        
+
+    def test_valid_token(self):
+        url = reverse("account:vrify",args=[self.token.key])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(response.data['token'],self.token.key)
+        self.assertEqual(response.data['msg'],"success fully return")
+
+
+    def test_unvalid_token(self):
+        bad_token =  "1faac6261e834d406fe84d3b3561413fc579d2a5"
+        url = reverse("account:vrify",args=[bad_token])
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['msg'],"time error")
+
+
+
+class DriverProfileViewTest(APITestCase):
+    def setUp(self):
+        self.user=User.objects.create_user(email='index@gmail.com', password='password123@',is_driver=True)
+        self.token = Token.objects.create(user=self.user)
+        self.profile = DriverProfile.objects.get(user=self.user)
+        self.url = reverse('account:driverprofile')
+        self.headers = {'Authorization': f'Token {self.token.key}'}
+
+    def test_show_profile(self):
+        response = self.client.get(self.url,headers=self.headers)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(response.data['email'],'index@gmail.com')
+
+
+    def test_update_profile(self):
+        img = BytesIO(
+            b"GIF89a\x01\x00\x01\x00\x00\x00\x00!\xf9\x04\x01\x00\x00\x00"
+            b"\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x01\x00\x00"
+        )
+        img.name = "myimage.jpg"
+        data = {"first_name":"Masoud","last_name":"kheradmandi","image":img,"cash_bank":12,"car":"SAMAND","count_trip":12}
+        response = self.client.put(self.url,data=data,headers=self.headers)
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED)
+        self.assertIn("your update success",str(response.content))
+
+    def test_update_by_unvalid_data(self):
+        bad_data = {"first_name":"Masoud","last_name":"kheradmandi","cash_bank":12,"car":"SAMAND","count_trip":12}
+        response = self.client.put(self.url,data=bad_data,headers=self.headers)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
 # --------------------------Views ---------------------------------------

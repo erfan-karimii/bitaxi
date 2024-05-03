@@ -104,7 +104,7 @@ class DriverProfileSerializers(serializers.ModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.cash_bank = validated_data.get('cash_bank', instance.cash_bank)
-        instance.photo = validated_data.get('photo', instance.photo)
+        instance.image = validated_data.get('image', instance.image)
         instance.car = validated_data.get('car', instance.car)
         instance.count_trip = validated_data.get('count_trip', instance.count_trip)
         

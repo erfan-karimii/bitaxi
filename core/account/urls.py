@@ -7,7 +7,7 @@ app_name = "account"
 
 urlpatterns = [
     path('driver_signup/',driver_views.DriverSignUP.as_view(),name='DriverSignUP'),
-    path('druseriver_signin/',driver_views.DriverLogin.as_view(),name='DriverSignIn'),
+    path('driver_signin/',driver_views.DriverLogin.as_view(),name='DriverSignIn'),
     path('reset_password/',driver_views.ResetPassword.as_view(),name='reset_password'),
     path('forget-password/',driver_views.ForgetPassword.as_view(),name='forget_password'),
     path('custom/<token>/',driver_views.VerifyForgetPassword.as_view(),name='vrify'),
