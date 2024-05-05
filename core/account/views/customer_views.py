@@ -23,7 +23,8 @@ class CustomerLoginView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, _ = Token.objects.get_or_create(user=user)
-        general_logger.info("a user created")
+        general_logger.info("a user login")
+                
         return Response({
             'token': token.key,
             'email': user.email
@@ -39,8 +40,7 @@ class RegisterCustomerView(APIView):
         password = serializer.validated_data.get('password')
         User.objects.create_user(email=email,password=password,is_customer=True)
         
-        # serializer.validated_data.update({'is_driver':True})
-        # serializer.save()
+        general_logger.info(f"user with {email} email address created")
         return Response({'created':f'user with {email} email address created'},status=status.HTTP_201_CREATED)
 
 
@@ -57,6 +57,7 @@ class CustomerResetPasswordView(APIView):
         password = serializer.validated_data.get('new_password')
         user.set_password(password)
         user.save()
+        general_logger.info(f"user {user.email} update password")
         return Response({"msg":"User password updated successfully"},status=status.HTTP_202_ACCEPTED)
         
 
