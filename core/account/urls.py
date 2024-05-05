@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import driver_views
-from account.views.customer_views import CustomerLoginView , RegisterCustomerView , CustomerResetPasswordView , CustomerForgetPasswordView, CustomerProfileView
+from account.views.customer_views import CustomerLoginView , RegisterCustomerView , CustomerResetPasswordView , CustomerForgetPasswordView,CustomerVerifyForgetPasswordView, CustomerProfileView
 
 app_name = "account"
 
@@ -21,6 +21,7 @@ customer_urlpatterns = [
     path('customer-register/',RegisterCustomerView.as_view(),name='register_user_view'),
     path('customer-reset-password/',CustomerResetPasswordView.as_view(),name='customer_reset_password'),
     path('customer-forget-password/',CustomerForgetPasswordView.as_view(),name='customer_forget_password'),
+    path('customer-verify-password/<str:token>/',CustomerVerifyForgetPasswordView.as_view(),name='customer_verify_password'),
     path('customer-profile/',CustomerProfileView.as_view(),name='customer_profile'),
 ]
 

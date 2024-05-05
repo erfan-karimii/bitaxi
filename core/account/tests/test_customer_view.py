@@ -52,7 +52,6 @@ class TestRegisterCustomerView(APITestCase):
         response = self.client.post(self.url,data=self.un_valid)
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
     
-    
         
 class TestCustomerResetPasswordView(APITestCase):
     def setUp(self) -> None:
@@ -85,6 +84,72 @@ class TestCustomerResetPasswordView(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
         # self.assert
         # self.assertEqual(response.data.get("msg"),"User password updated successfully")
+
+
+class TestCustomerForgetPasswordView(APITestCase):
+    def setUp(self) -> None:
+        self.user_email1 = 'test@test.com'
+        self.user_email2 = 'test2@test.com'
+        self.not_user_email = 'test3@test.com'
+        
+        self.customer_with_token = User.objects.create_user(email=self.user_email1, password='1',is_customer=True)
+        self.customer_without_token = User.objects.create_user(email=self.user_email2, password='2',is_customer=True)
+        self.token = Token.objects.create(user=self.customer_with_token)
+        
+        self.url = reverse("account:customer_forget_password")
+        self.client = APIClient()
+    
+    def test_unvalid_email(self):
+        response =  self.client.post(self.url,data={'email':'test'})
+        
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(response.data,{'email': ['Enter a valid email address.']})
+    
+    def test_unvalid_user(self):
+        response = self.client.post(self.url,data={'email':self.not_user_email})
+        
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(response.data,{'msg': 'Email Does Not exist'})
+    
+    def test_valid_user_exist_token(self):
+        response = self.client.post(self.url,data={'email':self.user_email1})
+        
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(Token.objects.count(),1)
+        self.assertDictEqual(response.data,{"msg":"recovery email send successfully"})
+    
+    def test_valid_user_not_exist_token(self):
+        response = self.client.post(self.url,data={'email':self.user_email2})
+        
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(Token.objects.count(),2)
+        self.assertDictEqual(response.data,{"msg":"recovery email send successfully"})
+    
         
         
+ 
+class TestCustomerVerifyForgetPasswordView(APITestCase):
+    def setUp(self) -> None:
+        self.customer = User.objects.create_user(email='test@test.com', password='1',is_customer=True)
+        self.token = Token.objects.create(user=self.customer).key
+        self.valid_url = reverse("account:customer_verify_password",kwargs={"token":self.token})
+        self.unvalid_url = reverse("account:customer_verify_password",kwargs={"token":"wrong token"})
+        self.client = APIClient()   
+    
+    def test_valid_token(self):
+        response = self.client.post(self.valid_url)
         
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertDictEqual(response.data,{"msg":"success fully return","token":self.token})
+        
+    
+    def test_unvalid_token(self):
+        response = self.client.post(self.unvalid_url)
+        
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(response.data,{"msg":"time error"})
+
+
+        
+# class TestCustomerProfileView(APITestCase):
+#     pass

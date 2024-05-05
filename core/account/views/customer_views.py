@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -66,9 +67,11 @@ class CustomerForgetPasswordView(APIView):
         email = serializers.EmailField(max_length=254)
     
     @staticmethod
-    def send_email(token):
+    def send_email(request,token,email):
         # Our Emails content
-        print(f'127.0.0.1:8000/custom/{token}/')
+        host_name = request.get_host()
+        send_mail(subject="forget password",message=f"http://{host_name}/forget/{token}/",
+                  from_email="admin@admin.com",recipient_list=[email],fail_silently=True)
 
     
     @extend_schema(request=InputSerializer)
@@ -79,8 +82,8 @@ class CustomerForgetPasswordView(APIView):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             token, created = Token.objects.get_or_create(user=user)
-            self.send_email(token)
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            self.send_email(request,token,email)
+            return Response({"msg":"recovery email send successfully"},status=status.HTTP_200_OK)
         else:
             return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)   
 
