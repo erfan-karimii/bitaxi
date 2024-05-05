@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from account.models import User , CustomerProfile
+from utils.loggers import error_logger
 
 
 class CustomAuthTokenSerializer(serializers.Serializer):
@@ -34,13 +35,16 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             # backend.)
             if not user:
                 msg = _('Unable to log in with provided credentials.')
+                error_logger.error(msg)
                 raise serializers.ValidationError(msg, code='authorization')
             
             if not user.is_customer:
                 msg = _('User is Not Valid Customer.')
+                error_logger.error(msg)
                 raise serializers.ValidationError(msg, code='authorization')
         else:
             msg = _('Must include "email" and "password".')
+            error_logger.error(msg)
             raise serializers.ValidationError(msg, code='authorization')
 
         attrs['user'] = user
@@ -56,7 +60,9 @@ class RegisterCustomerSerializer(serializers.ModelSerializer):
     
     def validate(self, attrs):
         if attrs.get('password') != attrs.get('password2'):
-            raise serializers.ValidationError({'password':'first and second password did\'nt match'})
+            msg = 'first and second password did\'nt match'
+            error_logger.error(msg)
+            raise serializers.ValidationError({'password':msg})
         return super().validate(attrs)
 
 
@@ -66,7 +72,9 @@ class CustomerResetPasswordSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         if attrs.get('new_password') != attrs.get('new_password2'):
-            raise serializers.ValidationError("Passowrd Does not same")
+            msg = "Passowrd Does not same"
+            error_logger.error(msg)
+            raise serializers.ValidationError({'password':"Passowrd Does not same"})
         
         return super().validate(attrs)
     

@@ -1,5 +1,6 @@
 *.pyc
 *.sqlite3
+*.log
 
 # Unit test / coverage reports
 htmlcov/
