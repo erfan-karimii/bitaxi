@@ -10,7 +10,7 @@ from account.serializers.customer_serizliers import CustomAuthTokenSerializer , 
 from account.models import CustomerProfile , User
 from account.permissions import IsAuthenticatedCustomer
 
-from utils.loggers import general_logger
+from utils.loggers import general_logger , error_logger
 
 
 
@@ -72,6 +72,7 @@ class CustomerForgetPasswordView(APIView):
         host_name = request.get_host()
         send_mail(subject="forget password",message=f"http://{host_name}/forget/{token}/",
                   from_email="admin@admin.com",recipient_list=[email],fail_silently=True)
+        general_logger.info(f"recovery email to {email} send successfully")
 
     
     @extend_schema(request=InputSerializer)
@@ -85,6 +86,7 @@ class CustomerForgetPasswordView(APIView):
             self.send_email(request,token,email)
             return Response({"msg":"recovery email send successfully"},status=status.HTTP_200_OK)
         else:
+            error_logger.error(f"Email {email} Does Not exist")
             return Response({"msg":"Email Does Not exist"},status=status.HTTP_400_BAD_REQUEST)   
 
 
@@ -101,8 +103,10 @@ class CustomerVerifyForgetPasswordView(APIView):
                 'token':token.key,
                 'msg':"success fully return"
             }
+            general_logger.info(f"token {token} send to frontend")
             return Response(response,status=status.HTTP_200_OK)
         else:
+            error_logger.error(f"token {token} does not exist.")
             return Response({"msg":"time error"},status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -111,6 +115,7 @@ class CustomerProfileView(APIView):
     def get(self,request):
         profile = CustomerProfile.objects.get(user=request.user)
         serializer = CustomerProfileSerializers(profile)
+        general_logger.info(f"profile {request.user.email} get")
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     @extend_schema(request=CustomerProfileUpdateSerializer)
@@ -119,7 +124,5 @@ class CustomerProfileView(APIView):
         serializer.is_valid(raise_exception=True)
         profile = CustomerProfile.objects.filter(user=request.user)
         profile.update(**serializer.validated_data)
+        general_logger.info(f"profile {request.user.email} updated")
         return Response({"msg":"profile update successfully"},status=status.HTTP_202_ACCEPTED)
-
-        
-        
