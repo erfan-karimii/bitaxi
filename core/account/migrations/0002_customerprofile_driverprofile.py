@@ -8,39 +8,82 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('account', '0001_initial'),
+        ("account", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CustomerProfile',
+            name="CustomerProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=254)),
-                ('last_name', models.CharField(max_length=254)),
-                ('cash_bank', models.IntegerField(default=0)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("first_name", models.CharField(max_length=254)),
+                ("last_name", models.CharField(max_length=254)),
+                ("cash_bank", models.IntegerField(default=0)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='DriverProfile',
+            name="DriverProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=254)),
-                ('last_name', models.CharField(max_length=254)),
-                ('cash_bank', models.IntegerField(default=0)),
-                ('photo', models.ImageField(upload_to='')),
-                ('car', models.CharField(choices=[('SAMAND', 'SAMAND'), ('PEUGEOT', 'PEUGEOT')], max_length=10)),
-                ('count_trip', models.PositiveIntegerField(default=0)),
-                ('created_at', models.DateTimeField(auto_now=True)),
-                ('status', models.CharField(choices=[('traveling', 'traveling'), ('No-travel', 'No-travel')], max_length=11)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("first_name", models.CharField(max_length=254)),
+                ("last_name", models.CharField(max_length=254)),
+                ("cash_bank", models.IntegerField(default=0)),
+                ("photo", models.ImageField(upload_to="")),
+                (
+                    "car",
+                    models.CharField(
+                        choices=[("SAMAND", "SAMAND"), ("PEUGEOT", "PEUGEOT")],
+                        max_length=10,
+                    ),
+                ),
+                ("count_trip", models.PositiveIntegerField(default=0)),
+                ("created_at", models.DateTimeField(auto_now=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("traveling", "traveling"),
+                            ("No-travel", "No-travel"),
+                        ],
+                        max_length=11,
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

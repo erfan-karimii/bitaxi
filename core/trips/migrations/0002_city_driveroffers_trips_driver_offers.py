@@ -7,35 +7,75 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('account', '0002_customerprofile_driverprofile'),
-        ('trips', '0001_initial'),
+        ("account", "0002_customerprofile_driverprofile"),
+        ("trips", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='City',
+            name="City",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=45)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=45)),
             ],
         ),
         migrations.CreateModel(
-            name='DriverOffers',
+            name="DriverOffers",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.IntegerField()),
-                ('start_offer_time', models.DateTimeField()),
-                ('end_offer_time', models.DateTimeField()),
-                ('active', models.BooleanField(default=True)),
-                ('destination', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='destination', to='trips.city')),
-                ('driver', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='account.driverprofile')),
-                ('origin', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='origin', to='trips.city')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("price", models.IntegerField()),
+                ("start_offer_time", models.DateTimeField()),
+                ("end_offer_time", models.DateTimeField()),
+                ("active", models.BooleanField(default=True)),
+                (
+                    "destination",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="destination",
+                        to="trips.city",
+                    ),
+                ),
+                (
+                    "driver",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="account.driverprofile",
+                    ),
+                ),
+                (
+                    "origin",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="origin",
+                        to="trips.city",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='trips',
-            name='driver_offers',
-            field=models.OneToOneField(default=None, on_delete=django.db.models.deletion.PROTECT, to='trips.driveroffers'),
+            model_name="trips",
+            name="driver_offers",
+            field=models.OneToOneField(
+                default=None,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="trips.driveroffers",
+            ),
             preserve_default=False,
         ),
     ]

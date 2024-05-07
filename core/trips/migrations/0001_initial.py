@@ -9,21 +9,41 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('account', '0002_customerprofile_driverprofile'),
+        ("account", "0002_customerprofile_driverprofile"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Trips',
+            name="Trips",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start_time', models.DateTimeField(auto_now=True)),
-                ('cost', models.IntegerField()),
-                ('discount_code', models.CharField(blank=True, null=True)),
-                ('is_end', models.BooleanField(default=False)),
-                ('is_cancel', models.BooleanField(default=False)),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='account.customerprofile')),
-                ('driver', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='account.driverprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start_time", models.DateTimeField(auto_now=True)),
+                ("cost", models.IntegerField()),
+                ("discount_code", models.CharField(blank=True, null=True)),
+                ("is_end", models.BooleanField(default=False)),
+                ("is_cancel", models.BooleanField(default=False)),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="account.customerprofile",
+                    ),
+                ),
+                (
+                    "driver",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="account.driverprofile",
+                    ),
+                ),
             ],
         ),
     ]

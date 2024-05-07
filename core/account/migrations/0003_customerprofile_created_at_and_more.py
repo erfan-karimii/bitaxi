@@ -7,25 +7,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('account', '0002_customerprofile_driverprofile'),
+        ("account", "0002_customerprofile_driverprofile"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customerprofile',
-            name='created_at',
+            model_name="customerprofile",
+            name="created_at",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AddField(
-            model_name='customerprofile',
-            name='updated_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="customerprofile",
+            name="updated_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='driverprofile',
-            name='updated_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="driverprofile",
+            name="updated_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
     ]

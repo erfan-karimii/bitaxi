@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('trips', '0004_alter_driveroffers_destination_and_more'),
+        ("trips", "0004_alter_driveroffers_destination_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='driveroffers',
-            name='end_key',
+            model_name="driveroffers",
+            name="end_key",
             field=models.CharField(default=12, max_length=120),
             preserve_default=False,
         ),
