@@ -20,7 +20,7 @@ class Trips(models.Model):
 
 
     def __str__(self):
-        return self.driver.full_name + "/"+ self.customer.full_name()
+        return self.driver.full_name + "/"+ self.customer.full_name
     
 
 class DriverOffers(models.Model):
@@ -64,6 +64,7 @@ class DriverOffers(models.Model):
     origin = models.CharField(max_length=254,choices=PROVINCE_CHOICES)
     destination = models.CharField(max_length=254,choices=PROVINCE_CHOICES)
     active = models.BooleanField(default=True)
+    end_key = models.CharField(max_length=120)
 
     def __str__(self):
         return self.driver.full_name + " " + self.origin+ " "+ self.destination
