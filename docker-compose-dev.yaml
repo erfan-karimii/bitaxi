@@ -43,6 +43,21 @@ services:
           - smtp4dev-data:/smtp4dev
       environment:
         - ServerOptions__HostName=smtp4dev
+  master:
+    image: docker.arvancloud.ir/locustio/locust
+    ports:
+     - "8089:8089"
+    volumes:
+      - ./core/locust/:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master -H http://django:8000
+  
+  worker:
+    image: docker.arvancloud.ir/locustio/locust
+    volumes:
+      - ./core/locust/:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
+
+  
 
 
 volumes:
