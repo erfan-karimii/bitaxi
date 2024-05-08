@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from trips.models import Trips, DriverOffers
+from trips.models import Trips, DriverOffers, Comment
 from rest_framework.validators import ValidationError
 
 
@@ -45,3 +45,31 @@ class DriverInputTripFinishSerializer(serializers.Serializer):
             raise ValidationError("Your end_key wrong!")
 
         return attrs
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    trip_start_time = serializers.ReadOnlyField(source="trip.start_time")
+    trip_is_end = serializers.ReadOnlyField(source="trip.is_end")
+    trip_is_cancel = serializers.ReadOnlyField(source="trip.is_cancel")
+    driver_offers_id = serializers.ReadOnlyField(source="trip.driver_offers_id")
+
+    class Meta:
+        model = Comment
+        fields = (
+            "driver",
+            "trip",
+            "customer",
+            "trip_start_time",
+            "trip_is_end",
+            "trip_is_cancel",
+            "driver_offers_id",
+            "text",
+            "score",
+            "created_at",
+        )
+        read_only_fields = ("created_at",)
+        extra_kwargs = {
+            "driver": {"write_only": True},
+            "trip": {"write_only": True},
+            "customer": {"write_only": True},
+        }

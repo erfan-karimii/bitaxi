@@ -4,7 +4,12 @@ from trips.views.driver_offers import (
     ListDriverOffer,
     DetailDriverOffer,
 )
-from trips.views.trips_views import OrderTrips, DriverTripsFinish
+from trips.views.trips_views import (
+    OrderTrips,
+    DriverTripsFinish,
+    CustomerCommentView,
+    CustomerCommentDetailView,
+)
 
 app_name = "trips"
 
@@ -14,4 +19,10 @@ urlpatterns = [
     path("offer/<int:id>/", DetailDriverOffer.as_view(), name="offer_detail"),
     path("orderoffer/", OrderTrips.as_view(), name="orderoffer"),
     path("finishtrips/", DriverTripsFinish.as_view(), name="finishtrips"),
+    path("customer_comment/", CustomerCommentView.as_view(), name="customer_comment"),
+    path(
+        "customer_comment_detail/<int:id>/",
+        CustomerCommentDetailView.as_view(),
+        name="customer_comment",
+    ),
 ]

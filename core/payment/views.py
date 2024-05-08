@@ -12,7 +12,7 @@ from .serializers import (
     DiscountDetailSerializer,
     DiscountDeleteSerializer,
 )
-from .models import Discount , DiscountUserProfile
+from .models import Discount, DiscountUserProfile
 
 # Create your views here.
 
@@ -63,5 +63,7 @@ class DiscountDetailView(APIView):
         if not discount.is_still_valid():
             raise serializers.ValidationError({"detail": "discount code expired"})
         serializer = self.serializer_class(discount)
-        DiscountUserProfile.objects.create(customer_profile=request.user.customerprofile,discount=discount)
+        DiscountUserProfile.objects.create(
+            customer_profile=request.user.customerprofile, discount=discount
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)

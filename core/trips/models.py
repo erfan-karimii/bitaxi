@@ -75,12 +75,13 @@ class DriverOffers(models.Model):
 class Comment(models.Model):
     customer = models.ForeignKey(CustomerProfile, on_delete=models.PROTECT)
     driver = models.ForeignKey(DriverProfile, on_delete=models.PROTECT)
-    trips = models.OneToOneField(Trips, on_delete=models.CASCADE)
+    trip = models.OneToOneField(Trips, on_delete=models.CASCADE)
     text = models.TextField(null=True, blank=True)
     score = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
+    is_show = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.customer.full_name + " " + self.score
+        return self.customer.full_name + " " + str(self.score)
