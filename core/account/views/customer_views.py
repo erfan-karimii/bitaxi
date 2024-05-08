@@ -79,7 +79,7 @@ class CustomerForgetPasswordView(APIView):
         email = serializers.EmailField(max_length=254)
 
     @staticmethod
-    def send_email(request, token, email):
+    def send_forget_password_email(request, token, email):
         # Our Emails content
         host_name = request.get_host()
         send_mail(
@@ -99,7 +99,7 @@ class CustomerForgetPasswordView(APIView):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             token, created = Token.objects.get_or_create(user=user)
-            self.send_email(request, token, email)
+            self.send_forget_password_email(request, token, email)
             return Response(
                 {"msg": "recovery email send successfully"}, status=status.HTTP_200_OK
             )

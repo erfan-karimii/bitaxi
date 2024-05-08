@@ -11,6 +11,8 @@ from trips.views.trips_views import (
     CustomerCommentDetailView,
     SuperuserCommentView,
     SuperuserCommentDetailView,
+    DriverComment,
+    DriverCommentDetailView,
 )
 
 app_name = "trips"
@@ -34,5 +36,13 @@ urlpatterns = [
         "superuser_comment_detail/<int:id>/",
         SuperuserCommentDetailView.as_view(),
         name="superuser_comment_detail",
+    ),
+    path(
+        "driver_comment/", DriverComment.as_view(), name="driver_comment"
+    ),
+    path(
+        "driver_comment_detail/<int:id>/",
+        DriverCommentDetailView.as_view(),
+        name="driver_comment_detail",
     ),
 ]

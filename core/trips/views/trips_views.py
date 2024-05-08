@@ -1,6 +1,15 @@
-from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from account.models import DriverProfile
+from django.core.mail import send_mail
+from django.conf import settings
+
+from rest_framework.views import APIView
+from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.validators import ValidationError
+from drf_spectacular.utils import extend_schema
+
+from account.models import DriverProfile , User
 from account.permissions import IsAuthenticatedCustomer, IsDriver, IsSuperuser
 from trips.models import DriverOffers, Trips, Comment
 from trips.serializers.trips_serializers import (
@@ -9,12 +18,7 @@ from trips.serializers.trips_serializers import (
     UserCommentSerializer,
     SuperuserCommentSerializer,
 )
-from rest_framework import serializers
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.validators import ValidationError
-from drf_spectacular.utils import extend_schema
-
+from utils.loggers import general_logger
 
 class OrderTrips(APIView):
     permission_classes = [
@@ -110,19 +114,19 @@ class CustomerCommentDetailView(APIView):
 
     @extend_schema(responses=UserCommentSerializer)
     def get(self, request, id):
-        comments = get_object_or_404(
+        comment = get_object_or_404(
             Comment, id=id, customer=request.user.customerprofile, is_show=True
         )
-        serializer = UserCommentSerializer(comments)
+        serializer = UserCommentSerializer(comment)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(responses=DeleteOutputSerializer)
     def delete(self, request, id):
-        comments = get_object_or_404(
+        comment = get_object_or_404(
             Comment, id=id, customer=request.user.customerprofile, is_show=True
         )
-        comments.is_show = False
-        comments.save()
+        comment.is_show = False
+        comment.save()
         return Response(
             {"msg": "comment delete successfully"}, status=status.HTTP_200_OK
         )
@@ -162,3 +166,47 @@ class SuperuserCommentDetailView(APIView):
         comment = get_object_or_404(Comment, id=id)
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DriverComment(APIView):
+    permission_classes = [IsDriver]
+
+    @extend_schema(responses=UserCommentSerializer)
+    def get(self, request):
+        comments = Comment.objects.filter(
+            driver=request.user.driverprofile ,is_show=True
+        )
+        serializer = UserCommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DriverCommentDetailView(APIView):
+    class InputReportSerializer(serializers.Serializer):
+        msg = serializers.CharField(max_length=254)
+
+    class OutputReportSerializer(serializers.Serializer):
+        msg = serializers.CharField(max_length=254)
+
+    permission_classes = [IsDriver]
+
+    @staticmethod
+    def send_report_email(msg,email,comment_id):
+        superusers_emails = User.objects.filter(is_superuser=True).values_list('email',flat=True)
+        send_mail(
+            subject="forget password",
+            message=f"email :{email}\ncomment id :{comment_id}\nmsg :{msg}",
+            from_email="admin@admin.com",
+            recipient_list=superusers_emails,
+            fail_silently=True,
+        )
+        general_logger.info(f"recovery email to {superusers_emails} send successfully")
+
+    @extend_schema(request=InputReportSerializer,responses=OutputReportSerializer)
+    def get(self, request, id):
+        comment = get_object_or_404(
+            Comment, id=id, driver=request.user.driverprofile, is_show=True
+        )
+        serializer = self.InputReportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.send_report_email(serializer.validated_data.get('msg'),request.user.email,comment.id)
+        return Response(serializer.data, status=status.HTTP_200_OK)

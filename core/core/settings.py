@@ -203,6 +203,7 @@ if sys.argv[1:2] == ["test"]:
 
 
 # email configuration
+ADMIN_EMAIL = "admin@admin.com"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = False
 EMAIL_HOST = "smtp4dev"
