@@ -8,10 +8,11 @@ class DiscountSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class DiscountDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Discount
-        fields = ("id",)
+class DiscountDeleteSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    # class Meta:
+    #     model = Discount
+    #     fields = ("id",)
 
 
 class DiscountDetailSerializer(serializers.ModelSerializer):

@@ -5,13 +5,14 @@ from rest_framework.response import Response
 from rest_framework import status, serializers
 from drf_spectacular.utils import extend_schema
 
+from account.permissions import IsAuthenticatedCustomer
 from .permissions import IsSuperUser
 from .serializers import (
     DiscountSerializer,
     DiscountDetailSerializer,
     DiscountDeleteSerializer,
 )
-from .models import Discount
+from .models import Discount , DiscountUserProfile
 
 # Create your views here.
 
@@ -31,6 +32,8 @@ class DiscountView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+class DeleteDiscountView(APIView):
     @extend_schema(request=DiscountDeleteSerializer)
     def delete(self, request):
         serializer = DiscountDeleteSerializer(data=request.data)
@@ -45,10 +48,12 @@ class DiscountView(APIView):
 
 class DiscountDetailView(APIView):
     serializer_class = DiscountDetailSerializer
+    permission_classes = [IsAuthenticatedCustomer]
 
     def get(self, request, code):
         discount = get_object_or_404(Discount, code=code)
         if not discount.is_still_valid():
-            raise serializers.ValidationError({"code": "discount code exired"})
+            raise serializers.ValidationError({"code": "discount code expired"})
         serializer = self.serializer_class(discount)
+        DiscountUserProfile.objects.create(customer_profile=request.user.customer_profile,discount=discount)
         return Response(serializer.data, status=status.HTTP_200_OK)
