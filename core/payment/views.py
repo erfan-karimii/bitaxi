@@ -34,16 +34,24 @@ class DiscountView(APIView):
 
 
 class DeleteDiscountView(APIView):
+    permission_classes = [IsSuperUser]
+
     @extend_schema(request=DiscountDeleteSerializer)
     def delete(self, request):
         serializer = DiscountDeleteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         discount_id = serializer.validated_data.get("id")
-        Discount.objects.get(id=discount_id).delete()
-        return Response(
-            {"discount": "discount deleted successfully"},
-            status=status.HTTP_204_NO_CONTENT,
-        )
+        is_deleted = Discount.objects.filter(id=discount_id).delete()
+        if is_deleted[0]:
+            return Response(
+                {"discount": "discount deleted successfully"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        else:
+            return Response(
+                {"detail": "invalid id sent."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class DiscountDetailView(APIView):
@@ -53,7 +61,7 @@ class DiscountDetailView(APIView):
     def get(self, request, code):
         discount = get_object_or_404(Discount, code=code)
         if not discount.is_still_valid():
-            raise serializers.ValidationError({"code": "discount code expired"})
+            raise serializers.ValidationError({"detail": "discount code expired"})
         serializer = self.serializer_class(discount)
-        DiscountUserProfile.objects.create(customer_profile=request.user.customer_profile,discount=discount)
+        DiscountUserProfile.objects.create(customer_profile=request.user.customerprofile,discount=discount)
         return Response(serializer.data, status=status.HTTP_200_OK)
