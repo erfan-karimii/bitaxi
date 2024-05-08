@@ -1,12 +1,13 @@
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from account.models import DriverProfile
-from account.permissions import IsAuthenticatedCustomer, IsDriver
+from account.permissions import IsAuthenticatedCustomer, IsDriver, IsSuperuser
 from trips.models import DriverOffers, Trips, Comment
 from trips.serializers.trips_serializers import (
     InputTripSerializer,
     DriverInputTripFinishSerializer,
-    CommentSerializer,
+    UserCommentSerializer,
+    SuperuserCommentSerializer,
 )
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -83,17 +84,17 @@ class CustomerCommentView(APIView):
 
     permission_classes = [IsAuthenticatedCustomer]
 
-    @extend_schema(responses=CommentSerializer)
+    @extend_schema(responses=UserCommentSerializer)
     def get(self, request):
         comments = Comment.objects.filter(
             customer=request.user.customerprofile, is_show=True
         )
-        serializer = CommentSerializer(comments, many=True)
+        serializer = UserCommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @extend_schema(request=CommentSerializer, responses=CreateOutputSerializer)
+    @extend_schema(request=UserCommentSerializer, responses=CreateOutputSerializer)
     def post(self, request):
-        serializer = CommentSerializer(data=request.data)
+        serializer = UserCommentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(
@@ -107,12 +108,12 @@ class CustomerCommentDetailView(APIView):
 
     permission_classes = [IsAuthenticatedCustomer]
 
-    @extend_schema(responses=CommentSerializer)
+    @extend_schema(responses=UserCommentSerializer)
     def get(self, request, id):
         comments = get_object_or_404(
             Comment, id=id, customer=request.user.customerprofile, is_show=True
         )
-        serializer = CommentSerializer(comments)
+        serializer = UserCommentSerializer(comments)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(responses=DeleteOutputSerializer)
@@ -125,3 +126,39 @@ class CustomerCommentDetailView(APIView):
         return Response(
             {"msg": "comment delete successfully"}, status=status.HTTP_200_OK
         )
+
+
+class SuperuserCommentView(APIView):
+    permission_classes = [IsSuperuser]
+
+    @extend_schema(responses=SuperuserCommentSerializer)
+    def get(self, request):
+        comments = Comment.objects.all()
+        serializer = SuperuserCommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SuperuserCommentDetailView(APIView):
+    class PatchInputSerializer(serializers.Serializer):
+        show = serializers.BooleanField()
+
+    class PatchOutputSerializer(serializers.Serializer):
+        msg = serializers.CharField()
+
+    permission_classes = [IsSuperuser]
+
+    @extend_schema(request=PatchInputSerializer, responses=PatchOutputSerializer)
+    def patch(self, request, id):
+        comment = get_object_or_404(Comment, id=id)
+        serializer = self.PatchInputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        comment.is_show = serializer.validated_data.get("show")
+        comment.save()
+        return Response(
+            {"msg": "comment change successfully"}, status=status.HTTP_202_ACCEPTED
+        )
+
+    def delete(self, request, id):
+        comment = get_object_or_404(Comment, id=id)
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

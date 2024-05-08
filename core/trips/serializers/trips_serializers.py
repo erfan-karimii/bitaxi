@@ -47,7 +47,7 @@ class DriverInputTripFinishSerializer(serializers.Serializer):
         return attrs
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class UserCommentSerializer(serializers.ModelSerializer):
     trip_start_time = serializers.ReadOnlyField(source="trip.start_time")
     trip_is_end = serializers.ReadOnlyField(source="trip.is_end")
     trip_is_cancel = serializers.ReadOnlyField(source="trip.is_cancel")
@@ -56,9 +56,9 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = (
+            "customer",
             "driver",
             "trip",
-            "customer",
             "trip_start_time",
             "trip_is_end",
             "trip_is_cancel",
@@ -73,3 +73,9 @@ class CommentSerializer(serializers.ModelSerializer):
             "trip": {"write_only": True},
             "customer": {"write_only": True},
         }
+
+
+class SuperuserCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = "__all__"

@@ -9,6 +9,8 @@ from trips.views.trips_views import (
     DriverTripsFinish,
     CustomerCommentView,
     CustomerCommentDetailView,
+    SuperuserCommentView,
+    SuperuserCommentDetailView,
 )
 
 app_name = "trips"
@@ -24,5 +26,13 @@ urlpatterns = [
         "customer_comment_detail/<int:id>/",
         CustomerCommentDetailView.as_view(),
         name="customer_comment",
+    ),
+    path(
+        "superuser_comment/", SuperuserCommentView.as_view(), name="superuser_comment"
+    ),
+    path(
+        "superuser_comment_detail/<int:id>/",
+        SuperuserCommentDetailView.as_view(),
+        name="superuser_comment_detail",
     ),
 ]
