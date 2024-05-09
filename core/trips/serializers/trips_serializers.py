@@ -36,6 +36,8 @@ class DriverInputTripFinishSerializer(serializers.Serializer):
             Trips.objects.get(id=value)
             return value
         except:
+            raise ValidationError("Your Trip do Not Exists!")
+        
             raise ValidationError("Your Trips Dose Not Exists!")
 
     def validate(self, attrs):
@@ -45,7 +47,6 @@ class DriverInputTripFinishSerializer(serializers.Serializer):
             raise ValidationError("Your end_key wrong!")
 
         return attrs
-
 
 class UserCommentSerializer(serializers.ModelSerializer):
     trip_start_time = serializers.ReadOnlyField(source="trip.start_time")
@@ -79,3 +80,5 @@ class SuperuserCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = "__all__"
+
+        
