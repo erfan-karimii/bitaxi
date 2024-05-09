@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payment', '0003_alter_discount_code_alter_discount_discount'),
+        ("payment", "0003_alter_discount_code_alter_discount_discount"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='discount',
-            name='discount',
-            field=models.IntegerField(validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)]),
+            model_name="discount",
+            name="discount",
+            field=models.IntegerField(
+                validators=[
+                    django.core.validators.MinValueValidator(0),
+                    django.core.validators.MaxValueValidator(100),
+                ]
+            ),
         ),
     ]

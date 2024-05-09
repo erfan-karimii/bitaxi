@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payment', '0002_alter_discount_discount'),
+        ("payment", "0002_alter_discount_discount"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='discount',
-            name='code',
+            model_name="discount",
+            name="code",
             field=models.CharField(max_length=25, unique=True),
         ),
         migrations.AlterField(
-            model_name='discount',
-            name='discount',
+            model_name="discount",
+            name="discount",
             field=models.IntegerField(),
         ),
     ]
