@@ -1,3 +1,4 @@
+from django.db.models import F
 from rest_framework.views import APIView
 from account.models import CustomerProfile, DriverProfile
 from account.permissions import IsAuthenticatedCustomer, IsDriver
@@ -42,42 +43,62 @@ class OrderTrips(APIView):
             self.close_all_driver_offer(driver=offer.driver)
             self.change_driver_status(driver=offer.driver)
             # Add Discount Code Later
-            
+
             response = {
-                'driver':offer.driver.full_name,
-                'car':offer.driver.car,
-                'cost':offer.price,
-                'end_key':offer.end_key
+                "driver": offer.driver.full_name,
+                "car": offer.driver.car,
+                "cost": offer.price,
+                "end_key": offer.end_key,
             }
-            return Response(response,status=status.HTTP_201_CREATED)
+            return Response(response, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors)
 
 
-
 class DriverTripsFinish(APIView):
-    permission_classes = [IsDriver,]
-    def patch(self,request):
+    permission_classes = [
+        IsDriver,
+    ]
+
+    @staticmethod
+    def finish_trips(id)-> bool:
+        is_end = Trips.objects.filter(id=id, is_end=False).update(is_end=True)
+        return is_end
+
+    @staticmethod
+    def change_driver_status(user)-> bool:
+        is_updated = DriverProfile.objects.filter(user=user, status="traveling").update(
+            status="No-travel"
+        )
+        return is_updated
+    
+    @staticmethod
+    def add_trip_count(driver):
+        # obj=DriverProfile.objects.get(user=driver)
+        # obj.count_trip += 1
+        # obj.save()
+        obj=DriverProfile.objects.get(user=driver)
+        obj.count_trip = F('count_trip') + 1
+        obj.save()
+        
+
+    def patch(self, request):
         serializer = DriverInputTripFinishSerializer(data=request.data)
         if serializer.is_valid():
-            is_end=Trips.objects.filter(id=request.data.get('id'),is_end=False).update(is_end=True)
-            is_updated= DriverProfile.objects.filter(user=request.user,status='traveling').update(status="No-travel")
+            is_end = self.finish_trips(id=request.data.get("id"))
+            is_updated = self.change_driver_status(user=request.user)
+
             if is_updated and is_end:
-                response = {
-                    'msg':'your Trips Finish'
-                }
-                return Response(response,status=status.HTTP_202_ACCEPTED)
+                response = {"msg": "your Trips Finish"}
+                self.add_trip_count(driver = request.user)
+                return Response(response, status=status.HTTP_202_ACCEPTED)
             else:
                 raise ValidationError("You Dont Have Active travel")
         else:
-            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TripsView(APIView):
-    
-    def post(self,request):
+
+    def post(self, request):
         pass

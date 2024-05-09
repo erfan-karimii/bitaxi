@@ -30,7 +30,7 @@ class DriverInputTripFinishSerializer(serializers.Serializer):
             Trips.objects.get(id=value)
             return value
         except:
-            raise ValidationError("Your Trips Dose Not Exists!")
+            raise ValidationError("Your Trip do Not Exists!")
         
     def validate(self, attrs):
         offer_end_key=Trips.objects.get(id=attrs['id']).driver_offers.end_key
