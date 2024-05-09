@@ -27,7 +27,7 @@ urlpatterns = [
     path(
         "customer_comment_detail/<int:id>/",
         CustomerCommentDetailView.as_view(),
-        name="customer_comment",
+        name="customer_comment_detail",
     ),
     path(
         "superuser_comment/", SuperuserCommentView.as_view(), name="superuser_comment"
@@ -37,9 +37,7 @@ urlpatterns = [
         SuperuserCommentDetailView.as_view(),
         name="superuser_comment_detail",
     ),
-    path(
-        "driver_comment/", DriverComment.as_view(), name="driver_comment"
-    ),
+    path("driver_comment/", DriverComment.as_view(), name="driver_comment"),
     path(
         "driver_comment_detail/<int:id>/",
         DriverCommentDetailView.as_view(),
