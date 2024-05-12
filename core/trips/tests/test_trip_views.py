@@ -300,6 +300,88 @@ class TestDriverCommentDetailView(APITestCase):
             data,
             headers={"Authorization": f"Token {self.driver_token.key}"},
         )
-        print(response.data)
         self.assertEqual(response.status_code,200)
         self.assertDictEqual(response.data,{'msg':'feed back received.'})
+
+class TestCancelTripView(APITestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+
+        self.customer = User.objects.create_user(
+            email="test@test.com", password="1", is_customer=True
+        )
+        self.customer_profile = CustomerProfile.objects.get(user=self.customer)
+        self.customer_token = Token.objects.create(user=self.customer)
+
+        self.customer2 = User.objects.create_user(
+            email="test2@test.com", password="1", is_customer=True
+        )
+        self.customer_profile2 = CustomerProfile.objects.get(user=self.customer2)
+        self.customer2_token = Token.objects.create(user=self.customer2)
+
+
+        self.driver = User.objects.create_user(
+            email="test1@test.com", password="1", is_driver=True
+        )
+        self.driver_profile = DriverProfile.objects.filter(user=self.driver)
+        
+        self.driver_profile.update(status = 'traveling')
+        self.driver_profile = self.driver_profile[0]
+        self.trip = baker.make(Trips,customer=self.customer_profile,driver=self.driver_profile,cost=100)
+        self.trip2 = baker.make(Trips,customer=self.customer_profile2,driver=self.driver_profile,cost=100,is_cancel=True)
+        self.trip3 = baker.make(Trips,customer=self.customer_profile2,driver=self.driver_profile,cost=100,is_end=True)
+
+        
+
+
+    def test_cancel_trip(self):
+        url = reverse("trips:cancel_trip",kwargs={"id":self.trip.id})
+
+        response = self.client.post(
+            url,
+            headers={"Authorization": f"Token {self.customer_token.key}"},
+        )
+
+        self.driver_profile.refresh_from_db()
+        self.trip.refresh_from_db()
+        self.customer_profile.refresh_from_db()
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(self.driver_profile.status ,"No-travel")
+        self.assertTrue(self.trip.is_cancel)
+        self.assertEqual(self.customer_profile.cash_bank,50)
+    
+    def test_wrong_trip_id(self):
+        url = reverse("trips:cancel_trip",kwargs={"id":self.trip2.id})
+
+        response = self.client.post(
+            url,
+            headers={"Authorization": f"Token {self.customer_token.key}"},
+        )
+
+        self.assertEqual(response.status_code,400)
+        self.assertDictEqual(response.data,{'msg':'not valid trip requested.'})
+    
+    def test_cancel_ended_trip(self):
+        url = reverse("trips:cancel_trip",kwargs={"id":self.trip2.id})
+
+        response = self.client.post(
+            url,
+            headers={"Authorization": f"Token {self.customer2_token.key}"},
+        )
+
+        self.assertEqual(response.status_code,400)
+        self.assertDictEqual(response.data,{'msg':'not valid trip requested.'})
+    
+    def test_cencel_cenceled_trip(self):
+        url = reverse("trips:cancel_trip",kwargs={"id":self.trip3.id})
+
+        response = self.client.post(
+            url,
+            headers={"Authorization": f"Token {self.customer2_token.key}"},
+        )
+
+        self.assertEqual(response.status_code,400)
+        self.assertDictEqual(response.data,{'msg':'not valid trip requested.'})
+            
+
