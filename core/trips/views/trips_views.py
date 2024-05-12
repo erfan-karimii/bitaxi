@@ -252,4 +252,4 @@ class DriverCommentDetailView(APIView):
         self.send_report_email(
             serializer.validated_data.get("msg"), request.user.email, comment.id
         )
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'msg':'feed back received.'}, status=status.HTTP_200_OK)
