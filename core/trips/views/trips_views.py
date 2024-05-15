@@ -1,6 +1,9 @@
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+from django.db import transaction
+
+
 from rest_framework import serializers
 from rest_framework.views import APIView
 from account.models import CustomerProfile, DriverProfile
@@ -252,4 +255,25 @@ class DriverCommentDetailView(APIView):
         self.send_report_email(
             serializer.validated_data.get("msg"), request.user.email, comment.id
         )
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'msg':'feed back received.'}, status=status.HTTP_200_OK)
+
+
+class CancelTripView(APIView):
+    permission_classes = [IsAuthenticatedCustomer]
+    @transaction.atomic
+    def post(self,request,id):
+        trip = get_object_or_404(Trips,id=id)
+        customer = request.user.customerprofile
+        if trip.customer == customer and not trip.is_end and not trip.is_cancel :
+            trip.is_cancel = True
+            trip.save()
+            driver = trip.driver
+            driver.status = "No-travel"
+            driver.save()
+            half_trip_cost = trip.cost // 2
+            customer.cash_bank = F('cash_bank') + half_trip_cost
+            customer.save()
+            # TODO: add 50% of trip cost to payment log
+            return Response({'msg':'trip cancel successfully.'},status=status.HTTP_200_OK)
+        else:
+            return Response({'msg':'not valid trip requested.'},status=status.HTTP_400_BAD_REQUEST)

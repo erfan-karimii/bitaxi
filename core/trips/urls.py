@@ -13,6 +13,7 @@ from trips.views.trips_views import (
     SuperuserCommentDetailView,
     DriverComment,
     DriverCommentDetailView,
+    CancelTripView
 )
 
 app_name = "trips"
@@ -43,4 +44,6 @@ urlpatterns = [
         DriverCommentDetailView.as_view(),
         name="driver_comment_detail",
     ),
+    path("cancel_trip/<int:id>/", CancelTripView.as_view(), name="cancel_trip"),
+
 ]
