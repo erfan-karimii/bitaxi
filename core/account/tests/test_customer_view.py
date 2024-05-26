@@ -174,4 +174,46 @@ class TestCustomerVerifyForgetPasswordView(APITestCase):
         self.assertDictEqual(response.data, {"msg": "time error"})
 
 
+class TestResendEmailConfirmView(APITestCase):
+    def setUp(self) -> None:
+        self.verified_customer = User.objects.create_user(
+            email="test@test.com", password="1", is_customer=True,is_verified=True
+        )
+        self.verified_customer_token = Token.objects.create(user=self.verified_customer).key
+        
+        self.unverified_customer = User.objects.create_user(
+            email="test1@test.com", password="11", is_customer=True,is_verified=False
+        )
+        self.unverified_customer_token = Token.objects.create(user=self.unverified_customer).key
+        
+        self.url = reverse("account:resend_conf_email")
+        self.client = APIClient()
+    
+    def test_post_verified_user(self):
+        response = self.client.post(self.url,{"email":"test@test.com"})
+        
+        self.assertEqual(response.status_code,400)
+    
+    def test_post_unverified_user(self):
+        response = self.client.post(self.url,{"email":"test1@test.com"})
+                
+        self.assertEqual(response.status_code,200)
+    
 
+class TestResendEmailConfirmView(APITestCase):
+    def setUp(self) -> None:
+        self.unverified_customer = User.objects.create_user(
+            email="test2@test.com", password="11", is_customer=True,is_verified=False,Token=1
+        )
+        self.unverified_customer_token = Token.objects.create(user=self.unverified_customer).key
+        
+        self.client = APIClient()
+    
+    def test_post_unverified_user(self):
+        url = reverse("account:confirm_email",kwargs={'email':'test2@test.com','token':1})
+        response = self.client.post(url)
+                
+        
+        self.unverified_customer.refresh_from_db()
+        self.assertEqual(response.status_code,200)
+        self.assertTrue(self.unverified_customer.is_verified)

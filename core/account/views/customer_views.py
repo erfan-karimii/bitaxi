@@ -46,7 +46,7 @@ class ConfirmEmailAddress(APIView):
             user.is_verified = True
             user.save()
         
-        return Response({'msg':'your email confirmed successfully'})
+        return Response({'msg':'your email confirmed successfully'},status=status.HTTP_200_OK)
 
 
 class ResendEmailConfirm(APIView):
@@ -63,7 +63,7 @@ class ResendEmailConfirm(APIView):
         email = serializer.validated_data.get('email')
         user = get_object_or_404(User,email=email)
         if not user.is_verified:
-            token = user.token
+            token = user.Token
             send_confirmation_email(request,token,email)
             return Response(
             {"msg": f"Please check your email to confirm your email address"},
