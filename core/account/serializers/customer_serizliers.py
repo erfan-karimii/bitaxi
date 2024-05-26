@@ -35,6 +35,11 @@ class CustomAuthTokenSerializer(serializers.Serializer):
                 msg = _("Unable to log in with provided credentials.")
                 error_logger.error(msg)
                 raise serializers.ValidationError(msg, code="authorization")
+            
+            if not user.is_verified:
+                msg = _("Please verify your email address first.")
+                error_logger.error(msg)
+                raise serializers.ValidationError(msg, code="authorization")
 
             if not user.is_customer:
                 msg = _("User is Not Valid Customer.")
@@ -89,3 +94,5 @@ class CustomerProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerProfile
         fields = ["first_name", "last_name"]
+
+    
