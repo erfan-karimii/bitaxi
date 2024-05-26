@@ -20,6 +20,7 @@ class Trips(models.Model):
     discount_code = models.CharField(null=True, blank=True)
     is_end = models.BooleanField(default=False)
     is_cancel = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
 
     def __str__(self):
         return self.driver.full_name + "/" + self.customer.full_name
