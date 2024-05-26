@@ -119,7 +119,7 @@ class TestDeleteDiscountView(APITestCase):
 class TestDiscountDetailView(APITestCase):
     def setUp(self) -> None:
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         self.not_customer = User.objects.create_user(
             email="test2@test.com", password="2", is_customer=False

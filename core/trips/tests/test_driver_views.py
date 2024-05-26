@@ -24,7 +24,7 @@ class OrderTripsTest(APITestCase):
         img.name = "myimage.jpg"
 
         self.user = User.objects.create_user(
-            email="index@gmail.com", password="password123", is_customer=True
+            email="index@gmail.com", password="password123", is_customer=True,is_verified=True
         )
         self.user_profile = CustomerProfile.objects.get(user=self.user)
         self.user_profile.first_name = "index"
@@ -127,7 +127,7 @@ class DriverTripsFinishTest(APITestCase):
         self.profile.save()
 
         self.user = User.objects.create_user(
-            email="index@gmail.com", password="password123", is_customer=True
+            email="index@gmail.com", password="password123", is_customer=True,is_verified=True
         )
         self.user_profile = CustomerProfile.objects.get(user=self.user)
         self.user_profile.first_name = "index"
