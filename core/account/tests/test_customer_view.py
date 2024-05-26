@@ -58,13 +58,13 @@ class TestRegisterCustomerView(APITestCase):
         }
         self.url = reverse("account:register_user_view")
 
-    def test_valid_driver_signup(self):
+    def test_valid_customer_signup(self):
         email = self.valid_data.get("email")
         response = self.client.post(self.url, data=self.valid_data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
-            response.data["created"], f"user with {email} email address created"
+            response.data["created"], f"Your account has been created successfully. Please check your email to confirm your email address"
         )
 
     def test_unvalid_driver_signup(self):
@@ -76,7 +76,7 @@ class TestRegisterCustomerView(APITestCase):
 class TestCustomerResetPasswordView(APITestCase):
     def setUp(self) -> None:
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         self.token = Token.objects.create(user=self.customer)
         self.password1 = "1"
@@ -148,7 +148,7 @@ class TestCustomerForgetPasswordView(APITestCase):
 class TestCustomerVerifyForgetPasswordView(APITestCase):
     def setUp(self) -> None:
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         self.token = Token.objects.create(user=self.customer).key
         self.valid_url = reverse(

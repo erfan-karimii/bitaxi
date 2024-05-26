@@ -8,6 +8,7 @@ from account.views.customer_views import (
     CustomerForgetPasswordView,
     CustomerVerifyForgetPasswordView,
     CustomerProfileView,
+    ConfirmEmailAddress
 )
 
 app_name = "account"
@@ -51,6 +52,8 @@ customer_urlpatterns = [
         name="customer_verify_password",
     ),
     path("customer-profile/", CustomerProfileView.as_view(), name="customer_profile"),
+    path("confirmation/<email>/<token>/", ConfirmEmailAddress.as_view(), name="confirm_email"),
+    
 ]
 
 

@@ -15,13 +15,13 @@ class TestCustomerCommentView(APITestCase):
         self.url = reverse("trips:customer_comment")
 
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         self.customer_profile = CustomerProfile.objects.get(user=self.customer)
         self.customer_token = Token.objects.create(user=self.customer)
 
         self.customer2 = User.objects.create_user(
-            email="test1@test.com", password="1", is_customer=True
+            email="test1@test.com", password="1", is_customer=True,is_verified=True
         )
         customer_profile2 = CustomerProfile.objects.get(user=self.customer2)
 
@@ -94,7 +94,7 @@ class TestCustomerCommentDetailView(APITestCase):
     def setUp(self) -> None:
         self.client = APIClient()
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         customer_profile = CustomerProfile.objects.get(user=self.customer)
         self.customer_token = Token.objects.create(user=self.customer)
@@ -163,7 +163,7 @@ class TestSuperuserCommentView(APITestCase):
         self.url = reverse("trips:superuser_comment") 
 
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         customer_profile = CustomerProfile.objects.get(user=self.customer)
 
@@ -193,7 +193,7 @@ class TestSuperuserCommentDetailView(APITestCase):
         self.client = APIClient()
 
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         customer_profile = CustomerProfile.objects.get(user=self.customer)
 
@@ -246,7 +246,7 @@ class TestDriverCommentView(APITestCase):
         self.url = reverse("trips:driver_comment")
 
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         customer_profile = CustomerProfile.objects.get(user=self.customer)
 
@@ -276,7 +276,7 @@ class TestDriverCommentDetailView(APITestCase):
         self.client = APIClient()
 
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         customer_profile = CustomerProfile.objects.get(user=self.customer)
 
@@ -303,18 +303,19 @@ class TestDriverCommentDetailView(APITestCase):
         self.assertEqual(response.status_code,200)
         self.assertDictEqual(response.data,{'msg':'feed back received.'})
 
+
 class TestCancelTripView(APITestCase):
     def setUp(self) -> None:
         self.client = APIClient()
 
         self.customer = User.objects.create_user(
-            email="test@test.com", password="1", is_customer=True
+            email="test@test.com", password="1", is_customer=True,is_verified=True
         )
         self.customer_profile = CustomerProfile.objects.get(user=self.customer)
         self.customer_token = Token.objects.create(user=self.customer)
 
         self.customer2 = User.objects.create_user(
-            email="test2@test.com", password="1", is_customer=True
+            email="test2@test.com", password="1", is_customer=True,is_verified=True
         )
         self.customer_profile2 = CustomerProfile.objects.get(user=self.customer2)
         self.customer2_token = Token.objects.create(user=self.customer2)

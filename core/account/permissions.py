@@ -10,7 +10,7 @@ class IsAuthenticatedCustomer(permissions.BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        return bool(user and user.is_authenticated and user.is_customer)
+        return bool(user and user.is_authenticated and user.is_customer and user.is_verified)
 
 
 class IsSuperuser(permissions.BasePermission):

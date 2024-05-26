@@ -1,4 +1,6 @@
+import random 
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -17,6 +19,7 @@ from account.models import CustomerProfile, User
 from account.permissions import IsAuthenticatedCustomer
 
 from utils.loggers import general_logger, error_logger
+from utils.emails import send_confirmation_email
 
 
 class CustomerLoginView(ObtainAuthToken):
@@ -35,6 +38,45 @@ class CustomerLoginView(ObtainAuthToken):
         return Response({"token": token.key, "email": user.email})
 
 
+class ConfirmEmailAddress(APIView):
+    def post(self,request,email,token):
+        
+        user = get_object_or_404(User,email=email,Token=token)
+        if not user.is_verified:
+            user.is_verified = True
+            user.save()
+        
+        return Response({'msg':'your email confirmed successfully'})
+
+
+class ResendEmailConfirm(APIView):
+    class InputSerializer(serializers.Serializer):
+        email = serializers.EmailField()
+    
+    class OutPutSerilizer(serializers.Serializer):
+        msg = serializers.CharField()
+
+    @extend_schema(request=InputSerializer,responses=OutPutSerilizer)
+    def post(self,request):
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        user = get_object_or_404(User,email=email)
+        if not user.is_verified:
+            token = user.token
+            send_confirmation_email(request,token,email)
+            return Response(
+            {"msg": f"Please check your email to confirm your email address"},
+            status=status.HTTP_200_OK,
+            )
+        else:
+            error_logger.error('email {email} is valid!')
+            return Response(
+            {"msg": f"Something is wrong. Please contact support for more information"},
+            status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
 class RegisterCustomerView(APIView):
     @extend_schema(request=RegisterCustomerSerializer)
     def post(self, request):
@@ -42,11 +84,13 @@ class RegisterCustomerView(APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get("email")
         password = serializer.validated_data.get("password")
-        User.objects.create_user(email=email, password=password, is_customer=True)
+        token = random.randint(1,100000)
+        User.objects.create_user(email=email, password=password, is_customer=True,is_verified=False,Token=token)
+        send_confirmation_email(request,token,email)
 
         general_logger.info(f"user with {email} email address created")
         return Response(
-            {"created": f"user with {email} email address created"},
+            {"created": f"Your account has been created successfully. Please check your email to confirm your email address"},
             status=status.HTTP_201_CREATED,
         )
 
@@ -89,7 +133,7 @@ class CustomerForgetPasswordView(APIView):
             recipient_list=[email],
             fail_silently=True,
         )
-        general_logger.info(f"recovery email to {email} send successfully")
+        general_logger.info(f"recovery email to {email} successfully")
 
     @extend_schema(request=InputSerializer)
     def post(self, request):
