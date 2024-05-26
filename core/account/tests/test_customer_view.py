@@ -174,5 +174,4 @@ class TestCustomerVerifyForgetPasswordView(APITestCase):
         self.assertDictEqual(response.data, {"msg": "time error"})
 
 
-# class TestCustomerProfileView(APITestCase):
-#     pass
+
