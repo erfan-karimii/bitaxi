@@ -144,7 +144,7 @@ class TestCustomerForgetPasswordView(APITestCase):
         self.assertEqual(Token.objects.count(), 2)
         self.assertDictEqual(response.data, {"msg": "recovery email send successfully"})
 
-
+ 
 class TestCustomerVerifyForgetPasswordView(APITestCase):
     def setUp(self) -> None:
         self.customer = User.objects.create_user(
@@ -200,7 +200,7 @@ class TestResendEmailConfirmView(APITestCase):
         self.assertEqual(response.status_code,200)
     
 
-class TestResendEmailConfirmView(APITestCase):
+class TestConfirmEmailAddressView(APITestCase):
     def setUp(self) -> None:
         self.unverified_customer = User.objects.create_user(
             email="test2@test.com", password="11", is_customer=True,is_verified=False,Token=1

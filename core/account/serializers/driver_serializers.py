@@ -1,10 +1,11 @@
-from account.models import User
-from django.contrib.auth import authenticate
-from rest_framework.validators import ValidationError
+from django.db.models.fields import BinaryField
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
-from account.models import DriverProfile
+from django.contrib.auth import authenticate
 
+from rest_framework.validators import ValidationError
+from rest_framework import serializers
+
+from account.models import User , DriverProfile
 
 class InputRegisterSerializers(serializers.ModelSerializer):
     password1 = serializers.CharField(max_length=250, write_only=True)
@@ -101,11 +102,17 @@ class DriverProfileSerializers(serializers.ModelSerializer):
     def get_email(self, obj):
         return obj.user.email
 
+
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.cash_bank = validated_data.get("cash_bank", instance.cash_bank)
         instance.image = validated_data.get("image", instance.image)
+        
+        if validated_data.get("ID_image") is not None:
+            instance.ID_image = DriverProfile.compress_image(validated_data.get("ID_image"))        
+            
+         
         instance.car = validated_data.get("car", instance.car)
         instance.count_trip = validated_data.get("count_trip", instance.count_trip)
 
