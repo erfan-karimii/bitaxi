@@ -94,7 +94,7 @@ class Paid(APIView):
             "MerchantID": settings.MERCHANT,
             "Amount": trips["cost__sum"],
             "Description": f"from bitaxi",
-            "CallbackURL": "http://127.0.0.1:8000/verify/",
+            "CallbackURL": "http://127.0.0.1:8000/payment/verify/",
         }
         data = json.dumps(data)
         # set content length by data

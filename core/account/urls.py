@@ -38,7 +38,7 @@ customer_urlpatterns = [
         "customer/register/", RegisterCustomerView.as_view(), name="register_user_view"
     ),
     path(
-        "customer/reset-password/",
+        "customer/password/reset/",
         CustomerResetPasswordView.as_view(),
         name="customer_reset_password",
     ),
@@ -53,8 +53,8 @@ customer_urlpatterns = [
         name="customer_verify_password",
     ),
     path("customer/profile/", CustomerProfileView.as_view(), name="customer_profile"),
-    path("email/confirmation/<email>/<token>/", ConfirmEmailAddress.as_view(), name="confirm_email"),
-    path("email/confirmation/resend/",ResendEmailConfirm.as_view(),name="resend_conf_email")
+    path("customer/email/confirmation/<email>/<token>/", ConfirmEmailAddress.as_view(), name="confirm_email"),
+    path("customer/email/confirmation/resend/",ResendEmailConfirm.as_view(),name="resend_conf_email")
     
 ]
 
