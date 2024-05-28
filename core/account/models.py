@@ -1,3 +1,7 @@
+from PIL import Image
+from io import BytesIO
+from base64 import b64encode
+
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager,
@@ -7,7 +11,7 @@ from django.contrib.auth.models import (
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
+from utils.arvan_bucket_conf import bucket
 # Create your models here.
 class UserManager(BaseUserManager):
 
@@ -83,10 +87,29 @@ class BaseProfile(models.Model):
 class DriverProfile(BaseProfile):
     CARS = (("SAMAND", "SAMAND"), ("PEUGEOT", "PEUGEOT"))
     STATUS = (("traveling", "traveling"), ("No-travel", "No-travel"))
+    ID_image = models.BinaryField(null=True,blank=True,editable=True)
     image = models.ImageField()
     car = models.CharField(choices=CARS, max_length=10)
     count_trip = models.PositiveIntegerField(default=0)
     status = models.CharField(choices=STATUS, max_length=11)
+    
+    def get_main_image(self):
+        return b64encode(self.main_image).decode('utf-8')
+    
+    @staticmethod
+    def compress_image(image,thumbnail_size=(400, 400)):
+        im = Image.open(image)
+        im_io = BytesIO()
+        im = im.convert('RGB')
+        if thumbnail_size:
+            im.thumbnail(thumbnail_size)
+        im.save(im_io, 'JPEG', quality=40)
+        return im_io.getvalue()
+    
+    def delete(self,*args,delete_files=False,**kwargs):
+        if delete_files:
+            bucket.delete_object(self.car_image.name)
+        return super().delete(*args,**kwargs)
 
 
 class CustomerProfile(BaseProfile):

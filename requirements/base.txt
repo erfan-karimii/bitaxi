@@ -3,8 +3,8 @@ pillow==10.2.0
 psycopg2-binary==2.9.9
 djangorestframework==3.14.0
 python-decouple==3.8
-locust
-
+boto3
+django-storages[s3]
 jdatetime==4.1.1
 
 drf_spectacular
