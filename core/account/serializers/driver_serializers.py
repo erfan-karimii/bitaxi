@@ -114,7 +114,6 @@ class DriverProfileSerializers(serializers.ModelSerializer):
             
          
         instance.car = validated_data.get("car", instance.car)
-        instance.count_trip = validated_data.get("count_trip", instance.count_trip)
 
         instance.save()
 

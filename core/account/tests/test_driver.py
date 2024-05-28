@@ -112,7 +112,7 @@ class DriverProfileSerializersTest(APITestCase):
         self.assertEqual(self.profile.image, img)
         self.assertEqual(self.profile.cash_bank, 12)
         self.assertEqual(self.profile.car, "SAMAND")
-        self.assertEqual(self.profile.count_trip, 12)
+        self.assertEqual(self.profile.count_trip, 0)
 
 
 # ------------------------- Serializers ------------------------------
