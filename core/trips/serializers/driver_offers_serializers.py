@@ -11,6 +11,7 @@ class DriverOfferSerializers(serializers.ModelSerializer):
             "id",
             "driver",
             "active",
+            "end_key"
         ]
 
     def create(self, obj, validated_data):
