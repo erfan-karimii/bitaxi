@@ -64,7 +64,7 @@ class TestRegisterCustomerView(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
-            response.data["created"], f"Your account has been created successfully. Please check your email to confirm your email address"
+            response.data["msg"], f"Your account has been created successfully. Please check your email to confirm your email address"
         )
 
     def test_unvalid_driver_signup(self):
