@@ -19,9 +19,9 @@ jobs:
       - name: Connect and Execute Commands
         uses: appleboy/ssh-action@master
         with:
-          username: ${{secrets.USER}}
-          key: ${{ secrets.PRIVATE_KEY }}
-          host: ${{secrets.HOST}}
+          username: ${{secrets.SSH_USER}}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{secrets.SSH_HOST}}
           script: |
             cd bitaxi
             docker compose -f docker-compose-dev.yaml down

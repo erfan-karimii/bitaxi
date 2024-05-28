@@ -36,4 +36,4 @@ jobs:
           - name: up the container
             run: docker compose -f docker-compose-dev.yaml up -d
           - name: run tests
-            run:  docker exec backend bash -c "python3 manage.py test --no-input"
+            run:  docker exec bitaxi-django-1 bash -c "python3 manage.py test --no-input"

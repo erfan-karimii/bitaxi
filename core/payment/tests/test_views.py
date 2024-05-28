@@ -195,9 +195,9 @@ class TestVerifyPaidView(APITestCase):
         self.customer_profile = CustomerProfile.objects.get(user=self.user)
         self.customer_profile2 = CustomerProfile.objects.get(user=self.user2)
         
-        self.trip1 = baker.make(Trips,customer=self.customer_profile,is_paid=False)
-        self.trip2 = baker.make(Trips,customer=self.customer_profile,is_paid=False)
-        self.trip3 = baker.make(Trips,customer=self.customer_profile2,is_paid=False)
+        self.trip1 = baker.make(Trips,customer=self.customer_profile,is_paid=False,cost=100)
+        self.trip2 = baker.make(Trips,customer=self.customer_profile,is_paid=False,cost=200)
+        self.trip3 = baker.make(Trips,customer=self.customer_profile2,is_paid=False,cost=300)
         
 
     def test_create_payment_log(self):
