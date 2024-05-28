@@ -15,6 +15,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
 
   django:
     build:
@@ -68,3 +71,4 @@ services:
 
 volumes:
   smtp4dev-data:
+  postgres-volume:
