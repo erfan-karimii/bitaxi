@@ -1,5 +1,11 @@
 from django.urls import path
-from .views import DiscountView, DiscountDetailView, DeleteDiscountView
+from .views import (
+    DiscountView,
+    DiscountDetailView,
+    DeleteDiscountView,
+    Paid,
+    VerifyPaid,
+)
 
 app_name = "payment"
 
@@ -11,4 +17,6 @@ urlpatterns = [
         DiscountDetailView.as_view(),
         name="discount_detail",
     ),
+    path("trips-payment/", Paid.as_view(), name="paid"),
+    path("verify/", VerifyPaid.as_view(), name="verifypaid"),
 ]

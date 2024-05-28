@@ -33,6 +33,7 @@ LOCAL_APPS = [
     "account.apps.AccountConfig",
     "trips.apps.TripsConfig",
     "payment.apps.PaymentConfig",
+    'django_extensions',
 ]
 
 THIRD_PARTY_APPS = ["rest_framework", "drf_spectacular", "rest_framework.authtoken"]
@@ -210,3 +211,12 @@ EMAIL_HOST = "smtp4dev"
 EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
 EMAIL_PORT = 25
+
+
+
+
+# ZARINPAL
+MERCHANT = '9fcdf799-adcd-42aa-99c0-35169d838586'
+ZP_API_REQUEST = f"https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
+ZP_API_VERIFY = f"https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
+ZP_API_STARTPAY = f"https://sandbox.zarinpal.com/pg/StartPay/"
