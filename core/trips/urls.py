@@ -44,6 +44,6 @@ urlpatterns = [
         DriverCommentDetailView.as_view(),
         name="driver_comment_detail",
     ),
-    path("cancel/<int:id>/", CancelTripView.as_view(), name="cancel_trip"),
+    path("offer/<int:id>/cancel", CancelTripView.as_view(), name="cancel_trip"),
 
 ]

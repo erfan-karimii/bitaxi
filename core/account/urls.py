@@ -25,7 +25,7 @@ urlpatterns = [
         driver_views.ForgetPassword.as_view(),
         name="forget_password",
     ),
-    path("custom/<token>/", driver_views.VerifyForgetPassword.as_view(), name="vrify"),
+    path("password/forget/verify/<token>/", driver_views.VerifyForgetPassword.as_view(), name="vrify"),
     path(
         "driver/profile/", driver_views.DriverProfileView.as_view(), name="driverprofile"
     ),
