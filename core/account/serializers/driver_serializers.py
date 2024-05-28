@@ -96,7 +96,7 @@ class DriverProfileSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = DriverProfile
-        exclude = ["status", "id", "created_at", "updated_at", "user"]
+        exclude = ["status", "id", "created_at", "updated_at", "user","count_trip"]
         # fields = "__all__"
 
     def get_email(self, obj):

@@ -10,7 +10,7 @@ from account.serializers.driver_serializers import (
     DriverProfileSerializers,
 )
 from rest_framework import status, serializers
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema , inline_serializer
 from account.models import User, DriverProfile
 from account.permissions import IsDriver
 
@@ -54,6 +54,22 @@ class ResetPassword(APIView):
         IsDriver,
     ]
 
+    @extend_schema(request=ResetPasswordSerializer,
+                   responses={
+                       200: inline_serializer(
+                           'SuccessResponseSerializer',
+                           fields={
+                               'msg':serializers.CharField()
+                           }
+                       ),
+                        400: inline_serializer(
+                           'FailResponseSerializer',
+                           fields={
+                               'non_field_errors':serializers.CharField()
+                           }
+                       ),
+                   },
+                   )
     def put(self, request):
         serializer = ResetPasswordSerializer(
             data=request.data, context={"request": request}
@@ -67,12 +83,16 @@ class ResetPassword(APIView):
 
 
 class ForgetPassword(APIView):
+    class OutputRegisterSerializers(serializers.Serializer):
+        msg = serializers.CharField(read_only=True)
+
 
     @staticmethod
     def send_email(token):
         # Our Emails content
         print(f"127.0.0.1:8000/custom/{token}/")
 
+    @extend_schema(request=ForgetPasswordSerializer,responses=OutputRegisterSerializers)
     def post(self, request):
         serializer = ForgetPasswordSerializer(data=request.data)
         if serializer.is_valid():
@@ -93,10 +113,16 @@ class ForgetPassword(APIView):
 
 
 class VerifyForgetPassword(APIView):
+    class OutputRegisterSerializers(serializers.Serializer):
+        msg = serializers.CharField(read_only=True)
+    
+    
     class SerializerVerifyForgetPasswordOutPut(serializers.Serializer):
         token = serializers.CharField(read_only=True)
         msg = serializers.CharField(read_only=True)
-
+    
+    
+    @extend_schema(responses=OutputRegisterSerializers)
     def post(self, request, token):
         if Token.objects.filter(key=token).exists():
             token = Token.objects.get(key=token)
@@ -107,15 +133,20 @@ class VerifyForgetPassword(APIView):
 
 
 class DriverProfileView(APIView):
+    class OutputRegisterSerializers(serializers.Serializer):
+        msg = serializers.CharField(read_only=True)
+    
     permission_classes = [
         IsDriver,
     ]
 
+    @extend_schema(responses=DriverProfileSerializers)
     def get(self, request):
         profile = DriverProfile.objects.get(user=request.user)
         serializer = DriverProfileSerializers(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(request=DriverProfileSerializers,responses=OutputRegisterSerializers)
     def put(self, request):
         profile = DriverProfile.objects.get(user=request.user)
         serializer = DriverProfileSerializers(profile, data=request.data)
