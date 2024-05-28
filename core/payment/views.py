@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,7 +15,7 @@ from .serializers import (
     PaidTripSerializer,
 )
 from trips.models import Trips
-from .models import Discount, DiscountUserProfile
+from .models import Discount, DiscountUserProfile , PayMentLog
 
 from django.conf import settings
 import requests
@@ -127,11 +128,17 @@ class Paid(APIView):
 
 class VerifyPaid(APIView):
     @staticmethod
-    def is_paid(trips):
+    def paid_trips(trips):
         trips.update(is_paid=True)
         # TODO : باقی کارها اینجا نوشته بشه
         # TODO: SEND message for driver Maybe :)
-        # ADD this to PAyment Log
+    
+    @staticmethod
+    def create_payment_log(user,cost,trips):
+        trips_count = trips.count()
+        trips_id = trips.values_list("id",flat=True)
+        PayMentLog.objects.create(user=user,cost=cost,day=timezone.now().date(),time=timezone.now().time(),status="INCREASE",
+                                  message=f"charge {cost} for {trips_count} trips and trips id {trips_id} ")
 
     def get(self, request):
         trips = Trips.objects.filter(
@@ -152,7 +159,8 @@ class VerifyPaid(APIView):
         if response.status_code == 200:
             response = response.json()
             if response["Status"] == 100:
-                self.is_paid(trips)
+                self.paid_trips(trips)
+                self.create_payment_log(request.user,cost["cost__sum"],trips)
                 return Response(
                     {
                         "status": True,

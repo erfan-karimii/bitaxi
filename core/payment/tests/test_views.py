@@ -11,8 +11,10 @@ from rest_framework import status
 
 from model_bakery import baker
 
-from account.models import User
-from payment.models import Discount, DiscountUserProfile
+from payment.views import VerifyPaid
+from trips.models import Trips
+from account.models import User , CustomerProfile
+from payment.models import Discount, DiscountUserProfile,PayMentLog
 
 
 class TestDiscountView(APITestCase):
@@ -183,3 +185,44 @@ class TestDiscountDetailView(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data.get("detail"), "Not found.")
+
+
+class TestVerifyPaidView(APITestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(email='test@test.com',password="1",is_customer=True)
+        self.user2 = User.objects.create_user(email='test2@test.com',password="1",is_customer=True)
+        
+        self.customer_profile = CustomerProfile.objects.get(user=self.user)
+        self.customer_profile2 = CustomerProfile.objects.get(user=self.user2)
+        
+        self.trip1 = baker.make(Trips,customer=self.customer_profile,is_paid=False)
+        self.trip2 = baker.make(Trips,customer=self.customer_profile,is_paid=False)
+        self.trip3 = baker.make(Trips,customer=self.customer_profile2,is_paid=False)
+        
+
+    def test_create_payment_log(self):
+        costs = self.trip1.cost + self.trip2.cost
+        trips = Trips.objects.filter(customer=self.customer_profile)
+        
+        VerifyPaid.create_payment_log(user=self.user,trips=trips,cost=costs)
+        
+        self.assertEqual(PayMentLog.objects.count(),1)
+        self.assertEqual(PayMentLog.objects.filter(user=self.user).count(),1)
+        self.assertEqual(PayMentLog.objects.filter(user=self.user2).count(),0)
+    
+    
+    def test_paid_trips(self):
+        trips = Trips.objects.filter(customer=self.customer_profile)
+        
+        VerifyPaid.paid_trips(trips)
+        
+        self.trip1.refresh_from_db()
+        self.trip2.refresh_from_db()
+        self.trip3.refresh_from_db()
+        
+        self.assertTrue(self.trip1.is_paid)
+        self.assertTrue(self.trip2.is_paid)
+        self.assertFalse(self.trip3.is_paid)
+        
+        
+        
