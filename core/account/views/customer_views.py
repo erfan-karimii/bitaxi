@@ -17,6 +17,7 @@ from account.serializers.customer_serizliers import (
 )
 from account.models import CustomerProfile, User
 from account.permissions import IsAuthenticatedCustomer
+from account.tasks import divide
 
 from utils.loggers import general_logger, error_logger
 from utils.emails import send_confirmation_email
