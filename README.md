@@ -33,4 +33,4 @@ docker-compose -f docker-compose-dev.yaml up --build
 After four years of programming, I can say with confidence that no database design is perfect unless it remains on paper.<br> Therefore, this database design will likely never reach a real-world environment and, consequently, contains many bugs and logical holes.<br> However, I have tried my best to come up with the best and most bug-free version of the database design to make my life easier.
 
 And finally, here is the design:👇<br>
-![database design image](./markdown/dbd.png)
+![database design image](./markdown/dbd2.png)
