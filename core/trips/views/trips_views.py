@@ -1,6 +1,5 @@
 from django.db.models import F
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
 from django.db import transaction
 
 
@@ -28,6 +27,7 @@ from trips.serializers.trips_serializers import (
     SuperuserCommentSerializer,
 )
 from utils.loggers import general_logger
+from utils.emails import send_report_email
 
 
 class OrderTrips(APIView):
@@ -230,20 +230,8 @@ class DriverCommentDetailView(APIView):
         msg = serializers.CharField(max_length=254)
 
     permission_classes = [IsDriver]
+    
 
-    @staticmethod
-    def send_report_email(msg, email, comment_id):
-        superusers_emails = User.objects.filter(is_superuser=True).values_list(
-            "email", flat=True
-        )
-        send_mail(
-            subject="forget password",
-            message=f"email :{email}\ncomment id :{comment_id}\nmsg :{msg}",
-            from_email="admin@admin.com",
-            recipient_list=superusers_emails,
-            fail_silently=True,
-        )
-        general_logger.info(f"recovery email to {superusers_emails} send successfully")
 
     @extend_schema(request=InputReportSerializer, responses=OutputReportSerializer)
     def post(self, request, id):
@@ -252,7 +240,7 @@ class DriverCommentDetailView(APIView):
         )
         serializer = self.InputReportSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.send_report_email(
+        send_report_email.delay(
             serializer.validated_data.get("msg"), request.user.email, comment.id
         )
         return Response({'msg':'feed back received.'}, status=status.HTTP_200_OK)
