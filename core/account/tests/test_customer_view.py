@@ -45,18 +45,19 @@ class TestCustomerLoginView(APITestCase):
 
 
 class TestRegisterCustomerView(APITestCase):
-    def setUp(self):
-        self.valid_data = {
+    @classmethod
+    def setUpTestData(cls):
+        cls.valid_data = {
             "email": "admin@admin.com",
             "password": "12",
             "password2": "12",
         }
-        self.un_valid = {
+        cls.un_valid = {
             "email": "admin@admin.com",
             "password": "122",
             "password2": "12",
         }
-        self.url = reverse("account:register_user_view")
+        cls.url = reverse("account:register_user_view")
 
     def test_valid_customer_signup(self):
         email = self.valid_data.get("email")
@@ -102,21 +103,22 @@ class TestCustomerResetPasswordView(APITestCase):
 
 
 class TestCustomerForgetPasswordView(APITestCase):
-    def setUp(self) -> None:
-        self.user_email1 = "test@test.com"
-        self.user_email2 = "test2@test.com"
-        self.not_user_email = "test3@test.com"
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_email1 = "test@test.com"
+        cls.user_email2 = "test2@test.com"
+        cls.not_user_email = "test3@test.com"
 
-        self.customer_with_token = User.objects.create_user(
-            email=self.user_email1, password="1", is_customer=True
+        cls.customer_with_token = User.objects.create_user(
+            email=cls.user_email1, password="1", is_customer=True
         )
-        self.customer_without_token = User.objects.create_user(
-            email=self.user_email2, password="2", is_customer=True
+        cls.customer_without_token = User.objects.create_user(
+            email=cls.user_email2, password="2", is_customer=True
         )
-        self.token = Token.objects.create(user=self.customer_with_token)
+        cls.token = Token.objects.create(user=cls.customer_with_token)
 
-        self.url = reverse("account:customer_forget_password")
-        self.client = APIClient()
+        cls.url = reverse("account:customer_forget_password")
+        cls.client = APIClient()
 
     def test_unvalid_email(self):
         response = self.client.post(self.url, data={"email": "test"})
@@ -146,18 +148,19 @@ class TestCustomerForgetPasswordView(APITestCase):
 
  
 class TestCustomerVerifyForgetPasswordView(APITestCase):
-    def setUp(self) -> None:
-        self.customer = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        self.token = Token.objects.create(user=self.customer).key
-        self.valid_url = reverse(
-            "account:customer_verify_password", kwargs={"token": self.token}
+        cls.token = Token.objects.create(user=cls.customer).key
+        cls.valid_url = reverse(
+            "account:customer_verify_password", kwargs={"token": cls.token}
         )
-        self.unvalid_url = reverse(
+        cls.unvalid_url = reverse(
             "account:customer_verify_password", kwargs={"token": "wrong token"}
         )
-        self.client = APIClient()
+        cls.client = APIClient()
 
     def test_valid_token(self):
         response = self.client.post(self.valid_url)
@@ -175,19 +178,20 @@ class TestCustomerVerifyForgetPasswordView(APITestCase):
 
 
 class TestResendEmailConfirmView(APITestCase):
-    def setUp(self) -> None:
-        self.verified_customer = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.verified_customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        self.verified_customer_token = Token.objects.create(user=self.verified_customer).key
+        cls.verified_customer_token = Token.objects.create(user=cls.verified_customer).key
         
-        self.unverified_customer = User.objects.create_user(
+        cls.unverified_customer = User.objects.create_user(
             email="test1@test.com", password="11", is_customer=True,is_verified=False
         )
-        self.unverified_customer_token = Token.objects.create(user=self.unverified_customer).key
+        cls.unverified_customer_token = Token.objects.create(user=cls.unverified_customer).key
         
-        self.url = reverse("account:resend_conf_email")
-        self.client = APIClient()
+        cls.url = reverse("account:resend_conf_email")
+        cls.client = APIClient()
     
     def test_post_verified_user(self):
         response = self.client.post(self.url,{"email":"test@test.com"})
@@ -201,13 +205,14 @@ class TestResendEmailConfirmView(APITestCase):
     
 
 class TestConfirmEmailAddressView(APITestCase):
-    def setUp(self) -> None:
-        self.unverified_customer = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.unverified_customer = User.objects.create_user(
             email="test2@test.com", password="11", is_customer=True,is_verified=False,Token=1
         )
-        self.unverified_customer_token = Token.objects.create(user=self.unverified_customer).key
+        cls.unverified_customer_token = Token.objects.create(user=cls.unverified_customer).key
         
-        self.client = APIClient()
+        cls.client = APIClient()
     
     def test_post_unverified_user(self):
         url = reverse("account:confirm_email",kwargs={'email':'test2@test.com','token':1})

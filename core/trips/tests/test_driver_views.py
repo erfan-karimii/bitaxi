@@ -16,43 +16,44 @@ from trips.views.trips_views import OrderTrips
 
 class OrderTripsTest(APITestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         img = BytesIO(
             b"GIF89a\x01\x00\x01\x00\x00\x00\x00!\xf9\x04\x01\x00\x00\x00"
             b"\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x01\x00\x00"
         )
         img.name = "myimage.jpg"
 
-        self.user = User.objects.create_user(
+        cls.user = User.objects.create_user(
             email="index@gmail.com", password="password123", is_customer=True,is_verified=True
         )
-        self.user_profile = CustomerProfile.objects.get(user=self.user)
-        self.user_profile.first_name = "index"
-        self.user_profile.last_name = "uix"
-        self.user_profile.cash_bank = 0
-        self.user_profile.save()
+        cls.user_profile = CustomerProfile.objects.get(user=cls.user)
+        cls.user_profile.first_name = "index"
+        cls.user_profile.last_name = "uix"
+        cls.user_profile.cash_bank = 0
+        cls.user_profile.save()
 
-        self.driver = User.objects.create_user(
+        cls.driver = User.objects.create_user(
             email="masoud@gmail.com",
             password="password123",
             is_driver=True,
         )
 
-        self.profile = DriverProfile.objects.get(user=self.driver)
-        self.profile.count_trip = 0
-        self.profile.car = "SAMAND"
-        self.profile.status = "No-travel"
-        self.profile.image = img.name
-        self.profile.save()
+        cls.profile = DriverProfile.objects.get(user=cls.driver)
+        cls.profile.count_trip = 0
+        cls.profile.car = "SAMAND"
+        cls.profile.status = "No-travel"
+        cls.profile.image = img.name
+        cls.profile.save()
 
-        self.token = Token.objects.create(user=self.user)
-        self.driver_offer = baker.make(DriverOffers, driver=self.profile, active=True)
-        self.driver_offer1 = baker.make(
+        cls.token = Token.objects.create(user=cls.user)
+        cls.driver_offer = baker.make(DriverOffers, driver=cls.profile, active=True)
+        cls.driver_offer1 = baker.make(
             DriverOffers,
-            driver=self.profile,
+            driver=cls.profile,
             active=True,
         )
-        self.url = reverse("trips:orderoffer")
+        cls.url = reverse("trips:orderoffer")
 
     def test_send_valid_data(self):
         headers = {"Authorization": f"Token {self.token.key}"}
@@ -105,7 +106,8 @@ class OrderTripsTest(APITestCase):
 
 class DriverTripsFinishTest(APITestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
 
         # driver
         img = BytesIO(
@@ -114,39 +116,39 @@ class DriverTripsFinishTest(APITestCase):
         )
         img.name = "myimage.jpg"
 
-        self.driver = User.objects.create_user(
+        cls.driver = User.objects.create_user(
             email="masoud@gmail.com",
             password="password123",
             is_driver=True,
         )
-        self.profile = DriverProfile.objects.get(user=self.driver)
-        self.profile.count_trip = 0
-        self.profile.car = "SAMAND"
-        self.profile.status = "traveling"
-        self.profile.image = img.name
-        self.profile.save()
+        cls.profile = DriverProfile.objects.get(user=cls.driver)
+        cls.profile.count_trip = 0
+        cls.profile.car = "SAMAND"
+        cls.profile.status = "traveling"
+        cls.profile.image = img.name
+        cls.profile.save()
 
-        self.user = User.objects.create_user(
+        cls.user = User.objects.create_user(
             email="index@gmail.com", password="password123", is_customer=True,is_verified=True
         )
-        self.user_profile = CustomerProfile.objects.get(user=self.user)
-        self.user_profile.first_name = "index"
-        self.user_profile.last_name = "uix"
-        self.user_profile.cash_bank = 0
-        self.user_profile.save()
+        cls.user_profile = CustomerProfile.objects.get(user=cls.user)
+        cls.user_profile.first_name = "index"
+        cls.user_profile.last_name = "uix"
+        cls.user_profile.cash_bank = 0
+        cls.user_profile.save()
 
-        self.token = Token.objects.create(user=self.driver)
+        cls.token = Token.objects.create(user=cls.driver)
 
-        self.driver_offer = baker.make(
-            DriverOffers, driver=self.profile, active=True, end_key="12bi"
+        cls.driver_offer = baker.make(
+            DriverOffers, driver=cls.profile, active=True, end_key="12bi"
         )
-        self.trips = baker.make(
+        cls.trips = baker.make(
             Trips,
-            driver=self.profile,
-            customer=self.user_profile,
-            driver_offers=self.driver_offer,
+            driver=cls.profile,
+            customer=cls.user_profile,
+            driver_offers=cls.driver_offer,
         )
-        self.url = reverse("trips:finishtrips")
+        cls.url = reverse("trips:finishtrips")
 
     def test_unvalid_id(self):
 

@@ -18,20 +18,21 @@ from payment.models import Discount, DiscountUserProfile,PayMentLog
 
 
 class TestDiscountView(APITestCase):
-    def setUp(self) -> None:
-        self.url = reverse("payment:discount")
-        self.passed_discount = baker.make(
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("payment:discount")
+        cls.passed_discount = baker.make(
             Discount, validate_time=timezone.now() - timedelta(days=1)
         )
-        self.valid_discount = baker.make(
+        cls.valid_discount = baker.make(
             Discount, validate_time=timezone.now() + timedelta(days=1)
         )
-        self.superuser = User.objects.create_superuser(
+        cls.superuser = User.objects.create_superuser(
             email="test@test.com",
             password="1",
         )
-        self.token = Token.objects.create(user=self.superuser).key
-        self.client = APIClient()
+        cls.token = Token.objects.create(user=cls.superuser).key
+        cls.client = APIClient()
 
     def test_get_all_discount(self):
         response = self.client.get(
@@ -70,19 +71,20 @@ class TestDiscountView(APITestCase):
 
 
 class TestDeleteDiscountView(APITestCase):
-    def setUp(self) -> None:
-        self.url = reverse("payment:delete_discount")
-        self.superuser = User.objects.create_superuser(
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("payment:delete_discount")
+        cls.superuser = User.objects.create_superuser(
             email="test@test.com",
             password="1",
         )
-        self.user = User.objects.create_user(
+        cls.user = User.objects.create_user(
             email="test2@test.com",
             password="1",
         )
-        self.user_token = Token.objects.create(user=self.user).key
-        self.token = Token.objects.create(user=self.superuser).key
-        self.client = APIClient()
+        cls.user_token = Token.objects.create(user=cls.user).key
+        cls.token = Token.objects.create(user=cls.superuser).key
+        cls.client = APIClient()
 
     def test_delete_discount(self):
         discount = baker.make(Discount)
@@ -119,24 +121,25 @@ class TestDeleteDiscountView(APITestCase):
 
 
 class TestDiscountDetailView(APITestCase):
-    def setUp(self) -> None:
-        self.customer = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        self.not_customer = User.objects.create_user(
+        cls.not_customer = User.objects.create_user(
             email="test2@test.com", password="2", is_customer=False
         )
-        self.customer_token = Token.objects.create(user=self.customer).key
-        self.not_customer_token = Token.objects.create(user=self.not_customer).key
+        cls.customer_token = Token.objects.create(user=cls.customer).key
+        cls.not_customer_token = Token.objects.create(user=cls.not_customer).key
 
-        self.passed_discount = baker.make(
+        cls.passed_discount = baker.make(
             Discount, validate_time=timezone.now() - timedelta(days=1)
         )
-        self.valid_discount = baker.make(
+        cls.valid_discount = baker.make(
             Discount, validate_time=timezone.now() + timedelta(days=1)
         )
 
-        self.client = APIClient()
+        cls.client = APIClient()
 
     def test_get_discount(self):
         url = reverse(
@@ -188,16 +191,17 @@ class TestDiscountDetailView(APITestCase):
 
 
 class TestVerifyPaidView(APITestCase):
-    def setUp(self) -> None:
-        self.user = User.objects.create_user(email='test@test.com',password="1",is_customer=True)
-        self.user2 = User.objects.create_user(email='test2@test.com',password="1",is_customer=True)
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(email='test@test.com',password="1",is_customer=True)
+        cls.user2 = User.objects.create_user(email='test2@test.com',password="1",is_customer=True)
         
-        self.customer_profile = CustomerProfile.objects.get(user=self.user)
-        self.customer_profile2 = CustomerProfile.objects.get(user=self.user2)
+        cls.customer_profile = CustomerProfile.objects.get(user=cls.user)
+        cls.customer_profile2 = CustomerProfile.objects.get(user=cls.user2)
         
-        self.trip1 = baker.make(Trips,customer=self.customer_profile,is_paid=False,cost=100)
-        self.trip2 = baker.make(Trips,customer=self.customer_profile,is_paid=False,cost=200)
-        self.trip3 = baker.make(Trips,customer=self.customer_profile2,is_paid=False,cost=300)
+        cls.trip1 = baker.make(Trips,customer=cls.customer_profile,is_paid=False,cost=100)
+        cls.trip2 = baker.make(Trips,customer=cls.customer_profile,is_paid=False,cost=200)
+        cls.trip3 = baker.make(Trips,customer=cls.customer_profile2,is_paid=False,cost=300)
         
 
     def test_create_payment_log(self):
