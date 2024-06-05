@@ -10,37 +10,38 @@ from trips.models import Comment, Trips
 
 
 class TestCustomerCommentView(APITestCase):
-    def setUp(self) -> None:
-        self.client = APIClient()
-        self.url = reverse("trips:customer_comment")
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = APIClient()
+        cls.url = reverse("trips:customer_comment")
 
-        self.customer = User.objects.create_user(
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        self.customer_profile = CustomerProfile.objects.get(user=self.customer)
-        self.customer_token = Token.objects.create(user=self.customer)
+        cls.customer_profile = CustomerProfile.objects.get(user=cls.customer)
+        cls.customer_token = Token.objects.create(user=cls.customer)
 
-        self.customer2 = User.objects.create_user(
+        cls.customer2 = User.objects.create_user(
             email="test1@test.com", password="1", is_customer=True,is_verified=True
         )
-        customer_profile2 = CustomerProfile.objects.get(user=self.customer2)
+        customer_profile2 = CustomerProfile.objects.get(user=cls.customer2)
 
-        self.not_customer = User.objects.create_user(
+        cls.not_customer = User.objects.create_user(
             email="test2@test.com", password="1", is_customer=False
         )
-        self.not_customer_token = Token.objects.create(user=self.not_customer)
+        cls.not_customer_token = Token.objects.create(user=cls.not_customer)
 
-        self.driver = User.objects.create_user(
+        cls.driver = User.objects.create_user(
             email="test3@test.com", password="1", is_driver=True
         )
-        self.driver_profile = DriverProfile.objects.get(user=self.driver)
+        cls.driver_profile = DriverProfile.objects.get(user=cls.driver)
 
-        self.trip = baker.make(
-            Trips, customer=self.customer_profile, driver=self.driver_profile
+        cls.trip = baker.make(
+            Trips, customer=cls.customer_profile, driver=cls.driver_profile
         )
 
-        self.comment = baker.make(Comment, customer=self.customer_profile, is_show=True)
-        self.comment2 = baker.make(Comment, customer=customer_profile2, is_show=True)
+        cls.comment = baker.make(Comment, customer=cls.customer_profile, is_show=True)
+        cls.comment2 = baker.make(Comment, customer=customer_profile2, is_show=True)
 
     def test_get_customer_comments(self):
         response = self.client.get(
@@ -91,29 +92,30 @@ class TestCustomerCommentView(APITestCase):
 
  
 class TestCustomerCommentDetailView(APITestCase):
-    def setUp(self) -> None:
-        self.client = APIClient()
-        self.customer = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = APIClient()
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        customer_profile = CustomerProfile.objects.get(user=self.customer)
-        self.customer_token = Token.objects.create(user=self.customer)
+        customer_profile = CustomerProfile.objects.get(user=cls.customer)
+        cls.customer_token = Token.objects.create(user=cls.customer)
 
-        self.not_customer = User.objects.create_user(
+        cls.not_customer = User.objects.create_user(
             email="test2@test.com", password="1", is_customer=False
         )
-        self.not_customer_token = Token.objects.create(user=self.not_customer)
+        cls.not_customer_token = Token.objects.create(user=cls.not_customer)
 
-        self.driver = User.objects.create_user(
+        cls.driver = User.objects.create_user(
             email="test3@test.com", password="1", is_driver=True
         )
-        self.driver_profile = DriverProfile.objects.get(user=self.driver)
+        cls.driver_profile = DriverProfile.objects.get(user=cls.driver)
 
-        self.trip = baker.make(
-            Trips, customer=customer_profile, driver=self.driver_profile
+        cls.trip = baker.make(
+            Trips, customer=customer_profile, driver=cls.driver_profile
         )
 
-        self.comment = baker.make(Comment, customer=customer_profile, is_show=True)
+        cls.comment = baker.make(Comment, customer=customer_profile, is_show=True)
 
     def test_get_detail_comment(self):
         url = reverse("trips:customer_comment_detail", kwargs={"id": self.comment.id})
@@ -158,23 +160,24 @@ class TestCustomerCommentDetailView(APITestCase):
 
     
 class TestSuperuserCommentView(APITestCase):    
-    def setUp(self) -> None:
-        self.client = APIClient()
-        self.url = reverse("trips:superuser_comment") 
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = APIClient()
+        cls.url = reverse("trips:superuser_comment") 
 
-        self.customer = User.objects.create_user(
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        customer_profile = CustomerProfile.objects.get(user=self.customer)
+        customer_profile = CustomerProfile.objects.get(user=cls.customer)
 
-        self.superuser = User.objects.create_superuser(
+        cls.superuser = User.objects.create_superuser(
             email="test2@test.com", password="1"
         )
-        self.superuser_token = Token.objects.create(user=self.superuser)
+        cls.superuser_token = Token.objects.create(user=cls.superuser)
 
 
-        self.comment = baker.make(Comment, customer=customer_profile, is_show=False)
-        self.comment = baker.make(Comment, customer=customer_profile, is_show=True)
+        cls.comment = baker.make(Comment, customer=customer_profile, is_show=False)
+        cls.comment = baker.make(Comment, customer=customer_profile, is_show=True)
 
     
 
@@ -189,22 +192,23 @@ class TestSuperuserCommentView(APITestCase):
 
 
 class TestSuperuserCommentDetailView(APITestCase):    
-    def setUp(self) -> None:
-        self.client = APIClient()
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = APIClient()
 
-        self.customer = User.objects.create_user(
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        customer_profile = CustomerProfile.objects.get(user=self.customer)
+        customer_profile = CustomerProfile.objects.get(user=cls.customer)
 
-        self.superuser = User.objects.create_superuser(
+        cls.superuser = User.objects.create_superuser(
             email="test2@test.com", password="1"
         )
-        self.superuser_token = Token.objects.create(user=self.superuser)
+        cls.superuser_token = Token.objects.create(user=cls.superuser)
 
 
-        self.comment_1 = baker.make(Comment, customer=customer_profile,score=2 ,is_show=False)
-        self.comment_2 = baker.make(Comment, customer=customer_profile, is_show=True)
+        cls.comment_1 = baker.make(Comment, customer=customer_profile,score=2 ,is_show=False)
+        cls.comment_2 = baker.make(Comment, customer=customer_profile, is_show=True)
 
 
     def test_superuser_delete_comment(self):
@@ -241,23 +245,24 @@ class TestSuperuserCommentDetailView(APITestCase):
 
 
 class TestDriverCommentView(APITestCase):
-    def setUp(self) -> None:
-        self.client = APIClient()
-        self.url = reverse("trips:driver_comment")
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = APIClient()
+        cls.url = reverse("trips:driver_comment")
 
-        self.customer = User.objects.create_user(
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        customer_profile = CustomerProfile.objects.get(user=self.customer)
+        customer_profile = CustomerProfile.objects.get(user=cls.customer)
 
-        self.driver = User.objects.create_user(
+        cls.driver = User.objects.create_user(
             email="test1@test.com", password="1", is_driver=True
         )
-        driver_profile = DriverProfile.objects.get(user=self.driver)
-        self.driver_token = Token.objects.create(user=self.driver)
+        driver_profile = DriverProfile.objects.get(user=cls.driver)
+        cls.driver_token = Token.objects.create(user=cls.driver)
 
-        self.comment_1 = baker.make(Comment,text='test1', customer=customer_profile,driver=driver_profile,is_show=False)
-        self.comment_2 = baker.make(Comment,text='test2', customer=customer_profile,driver=driver_profile,is_show=True)
+        cls.comment_1 = baker.make(Comment,text='test1', customer=customer_profile,driver=driver_profile,is_show=False)
+        cls.comment_2 = baker.make(Comment,text='test2', customer=customer_profile,driver=driver_profile,is_show=True)
     
 
     def test_driver_get_comments(self):
@@ -272,22 +277,23 @@ class TestDriverCommentView(APITestCase):
     
 
 class TestDriverCommentDetailView(APITestCase):
-    def setUp(self) -> None:
-        self.client = APIClient()
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = APIClient()
 
-        self.customer = User.objects.create_user(
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        customer_profile = CustomerProfile.objects.get(user=self.customer)
+        customer_profile = CustomerProfile.objects.get(user=cls.customer)
 
-        self.driver = User.objects.create_user(
+        cls.driver = User.objects.create_user(
             email="test1@test.com", password="1", is_driver=True
         )
-        driver_profile = DriverProfile.objects.get(user=self.driver)
-        self.driver_token = Token.objects.create(user=self.driver)
+        driver_profile = DriverProfile.objects.get(user=cls.driver)
+        cls.driver_token = Token.objects.create(user=cls.driver)
 
-        self.comment_1 = baker.make(Comment,text='test1', customer=customer_profile,driver=driver_profile,is_show=False)
-        self.comment_2 = baker.make(Comment,text='test2', customer=customer_profile,driver=driver_profile,is_show=True)
+        cls.comment_1 = baker.make(Comment,text='test1', customer=customer_profile,driver=driver_profile,is_show=False)
+        cls.comment_2 = baker.make(Comment,text='test2', customer=customer_profile,driver=driver_profile,is_show=True)
 
     def test_driver_report_comment(self):
         url = reverse("trips:driver_comment_detail",kwargs={'id':self.comment_2.id})
@@ -305,32 +311,33 @@ class TestDriverCommentDetailView(APITestCase):
 
 
 class TestCancelTripView(APITestCase):
-    def setUp(self) -> None:
-        self.client = APIClient()
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = APIClient()
 
-        self.customer = User.objects.create_user(
+        cls.customer = User.objects.create_user(
             email="test@test.com", password="1", is_customer=True,is_verified=True
         )
-        self.customer_profile = CustomerProfile.objects.get(user=self.customer)
-        self.customer_token = Token.objects.create(user=self.customer)
+        cls.customer_profile = CustomerProfile.objects.get(user=cls.customer)
+        cls.customer_token = Token.objects.create(user=cls.customer)
 
-        self.customer2 = User.objects.create_user(
+        cls.customer2 = User.objects.create_user(
             email="test2@test.com", password="1", is_customer=True,is_verified=True
         )
-        self.customer_profile2 = CustomerProfile.objects.get(user=self.customer2)
-        self.customer2_token = Token.objects.create(user=self.customer2)
+        cls.customer_profile2 = CustomerProfile.objects.get(user=cls.customer2)
+        cls.customer2_token = Token.objects.create(user=cls.customer2)
 
 
-        self.driver = User.objects.create_user(
+        cls.driver = User.objects.create_user(
             email="test1@test.com", password="1", is_driver=True
         )
-        self.driver_profile = DriverProfile.objects.filter(user=self.driver)
+        cls.driver_profile = DriverProfile.objects.filter(user=cls.driver)
         
-        self.driver_profile.update(status = 'traveling')
-        self.driver_profile = self.driver_profile[0]
-        self.trip = baker.make(Trips,customer=self.customer_profile,driver=self.driver_profile,cost=100)
-        self.trip2 = baker.make(Trips,customer=self.customer_profile2,driver=self.driver_profile,cost=100,is_cancel=True)
-        self.trip3 = baker.make(Trips,customer=self.customer_profile2,driver=self.driver_profile,cost=100,is_end=True)
+        cls.driver_profile.update(status = 'traveling')
+        cls.driver_profile = cls.driver_profile[0]
+        cls.trip = baker.make(Trips,customer=cls.customer_profile,driver=cls.driver_profile,cost=100)
+        cls.trip2 = baker.make(Trips,customer=cls.customer_profile2,driver=cls.driver_profile,cost=100,is_cancel=True)
+        cls.trip3 = baker.make(Trips,customer=cls.customer_profile2,driver=cls.driver_profile,cost=100,is_end=True)
 
         
 

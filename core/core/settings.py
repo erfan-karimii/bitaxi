@@ -219,7 +219,8 @@ if sys.argv[1:2] == ["test"]:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_IGNORE_RESULT = True
 
 # email configuration
 ADMIN_EMAIL = "admin@admin.com"
