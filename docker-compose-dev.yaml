@@ -37,6 +37,17 @@ services:
         condition: service_healthy
     restart: on-failure
 
+  celery:
+    build:
+      context: .
+      dockerfile: docker/dev.Dockerfile
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./core/:/app
+    depends_on:
+      - redis
+    restart: on-failure
+
   smtp4dev:
       image: docker.arvancloud.ir/rnwood/smtp4dev:v3
       restart: always
@@ -52,6 +63,7 @@ services:
           - smtp4dev-data:/smtp4dev
       environment:
         - ServerOptions__HostName=smtp4dev
+  
   master:
     image: docker.arvancloud.ir/locustio/locust
     ports:
@@ -66,9 +78,17 @@ services:
       - ./core/locust/:/mnt/locust
     command: -f /mnt/locust/locustfile.py --worker --master-host master
 
+  redis:
+    image: docker.arvancloud.ir/redis
+    container_name: redis-celery
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-volume:/data
   
 
 
 volumes:
   smtp4dev-data:
   postgres-volume:
+  redis-volume:
