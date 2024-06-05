@@ -17,6 +17,7 @@ from account.serializers.customer_serizliers import (
 )
 from account.models import CustomerProfile, User
 from account.permissions import IsAuthenticatedCustomer
+from account.tasks import divide
 
 from utils.loggers import general_logger, error_logger
 from utils.emails import send_confirmation_email
@@ -39,6 +40,10 @@ class CustomerLoginView(ObtainAuthToken):
 
 
 class ConfirmEmailAddress(APIView):
+    class OutputSerializer(serializers.Serializer):
+        msg = serializers.CharField(read_only=True)
+    
+    @extend_schema(responses=OutputSerializer)
     def post(self,request,email,token):
         
         user = get_object_or_404(User,email=email,Token=token)
@@ -78,7 +83,10 @@ class ResendEmailConfirm(APIView):
 
 
 class RegisterCustomerView(APIView):
-    @extend_schema(request=RegisterCustomerSerializer)
+    class OutputSerializer(serializers.Serializer):
+        msg = serializers.CharField(read_only=True)
+    
+    @extend_schema(request=RegisterCustomerSerializer,responses=OutputSerializer)
     def post(self, request):
         serializer = RegisterCustomerSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -90,7 +98,7 @@ class RegisterCustomerView(APIView):
 
         general_logger.info(f"user with {email} email address created")
         return Response(
-            {"created": f"Your account has been created successfully. Please check your email to confirm your email address"},
+            {"msg": f"Your account has been created successfully. Please check your email to confirm your email address"},
             status=status.HTTP_201_CREATED,
         )
 
@@ -121,6 +129,9 @@ class CustomerResetPasswordView(APIView):
 class CustomerForgetPasswordView(APIView):
     class InputSerializer(serializers.Serializer):
         email = serializers.EmailField(max_length=254)
+    
+    class OutputSerializer(serializers.Serializer):
+        msg = serializers.CharField(max_length=254)
 
     @staticmethod
     def send_forget_password_email(request, token, email):
@@ -135,7 +146,7 @@ class CustomerForgetPasswordView(APIView):
         )
         general_logger.info(f"recovery email to {email} successfully")
 
-    @extend_schema(request=InputSerializer)
+    @extend_schema(request=InputSerializer,responses=OutputSerializer)
     def post(self, request):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -175,6 +186,9 @@ class CustomerProfileView(APIView):
     permission_classes = [
         IsAuthenticatedCustomer,
     ]
+    class OutputSerializer(serializers.Serializer):
+        msg = serializers.CharField(read_only=True)
+
 
     def get(self, request):
         profile = CustomerProfile.objects.get(user=request.user)
@@ -182,7 +196,8 @@ class CustomerProfileView(APIView):
         general_logger.info(f"profile {request.user.email} get")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @extend_schema(request=CustomerProfileUpdateSerializer)
+
+    @extend_schema(request=CustomerProfileUpdateSerializer,responses=OutputSerializer)
     def patch(self, request):
         serializer = CustomerProfileUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
