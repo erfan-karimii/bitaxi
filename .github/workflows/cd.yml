@@ -24,7 +24,7 @@ jobs:
           host: ${{secrets.SSH_HOST}}
           script: |
             cd bitaxi
-            docker compose -f docker-compose-dev.yaml down
+            docker compose -f docker-compose-prod.yaml down
             git pull
-            docker compose -f docker-compose-dev.yaml build
-            docker compose -f docker-compose-dev.yaml up -d --force-recreate
+            docker compose -f docker-compose-prod.yaml build
+            docker compose -f docker-compose-prod.yaml up -d --force-recreate
