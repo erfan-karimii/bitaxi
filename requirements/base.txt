@@ -9,4 +9,5 @@ boto3
 django-storages[s3]
 jdatetime==4.1.1
 
+requests
 drf_spectacular
