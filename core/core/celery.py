@@ -4,9 +4,8 @@ from celery import Celery
 
 from django.conf import settings
 
-# this code copied from manage.py
 # set the default Django settings module for the 'celery' app.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.prod')
 
 # you can change the name here
 app = Celery("core")
