@@ -1,18 +1,12 @@
 name: CD for bitaxi
 on:
-    pull_request:
+    push:
       branches:
         - main
   
 jobs:
-    quality-assurance:
-      name: check CI before deploy 
-      uses: ./.github/workflows/ci.yml
-
     simple_CD:
       name: Django CD
-      needs:
-        - quality-assurance
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v3
