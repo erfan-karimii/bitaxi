@@ -19,16 +19,17 @@ from model_bakery import baker
 
 
 class IsDriverPermissionTestCase(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.user1 = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.factory = RequestFactory()
+        cls.user1 = User.objects.create_user(
             email="idnex@gmail.com", password="12", is_driver=True
         )
-        self.user2 = User.objects.create_user(
+        cls.user2 = User.objects.create_user(
             email="test@gmail.com", password="12", is_customer=True
         )
-        self.view = DriverProfileView.as_view()
-        self.permission = IsDriver()
+        cls.view = DriverProfileView.as_view()
+        cls.permission = IsDriver()
 
     def test_driver_permission(self):
         urls = self.factory.get(reverse("account:driverprofile"))
@@ -46,13 +47,14 @@ class IsDriverPermissionTestCase(TestCase):
 
 
 class InputRegisterSerializersTest(TestCase):
-    def setUp(self):
-        self.valid_data = {
+    @classmethod
+    def setUpTestData(cls):
+        cls.valid_data = {
             "email": "admin@admin.com",
             "password": "12",
             "password1": "12",
         }
-        self.invalid_data = {"email": "", "password": "12", "password1": "12"}
+        cls.invalid_data = {"email": "", "password": "12", "password1": "12"}
 
     def test_valid_data(self):
         serializer = InputRegisterSerializers(data=self.valid_data)
@@ -77,14 +79,15 @@ class InputRegisterSerializersTest(TestCase):
 
 
 class DriverProfileSerializersTest(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
             email="index@gmail.com", password="password123@", is_driver=True
         )
-        self.token = Token.objects.create(user=self.user)
-        self.profile = DriverProfile.objects.get(user=self.user)
-        self.url = reverse("account:driverprofile")
-        self.headers = {"Authorization": f"Token {self.token.key}"}
+        cls.token = Token.objects.create(user=cls.user)
+        cls.profile = DriverProfile.objects.get(user=cls.user)
+        cls.url = reverse("account:driverprofile")
+        cls.headers = {"Authorization": f"Token {cls.token.key}"}
 
     def test_get_email(self):
         cl_obj = DriverProfileSerializers()
@@ -122,18 +125,19 @@ class DriverProfileSerializersTest(APITestCase):
 
 
 class TestDriverSignUp(TestCase):
-    def setUp(self):
-        self.valid_data = {
+    @classmethod
+    def setUpTestData(cls):
+        cls.valid_data = {
             "email": "admin@admin.com",
             "password": "12",
             "password1": "12",
         }
-        self.un_valid = {
+        cls.un_valid = {
             "email": "admin@admin.com",
             "password": "122",
             "password1": "12",
         }
-        self.url = reverse("account:DriverSignUP")
+        cls.url = reverse("account:DriverSignUP")
 
     def test_valid_driver_signup(self):
 
@@ -153,14 +157,15 @@ class TestDriverSignUp(TestCase):
 
 
 class TestDriverSignIn(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         User.objects.create_user(
             email="index@gmail.com", password="password123", is_driver=True
         )
         User.objects.create_user(
             email="customer@gmail.com", password="password123", is_driver=False
         )
-        self.url = reverse("account:DriverSignIn")
+        cls.url = reverse("account:DriverSignIn")
 
     def test_valid_login(self):
         data = {"email": "index@gmail.com", "password": "password123"}
@@ -182,12 +187,13 @@ class TestDriverSignIn(TestCase):
 
 
 class ResetPasswordTest(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
             email="index@gmail.com", password="password123@", is_driver=True
         )
-        self.token = Token.objects.create(user=self.user)
-        self.url = reverse("account:reset_password")
+        cls.token = Token.objects.create(user=cls.user)
+        cls.url = reverse("account:reset_password")
 
     def test_valid_reset_password(self):
         data = {"new_password": "password1234", "new_password1": "password1234"}
@@ -208,11 +214,12 @@ class ResetPasswordTest(APITestCase):
 
 
 class ForgetPasswordTest(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
             email="index@gmail.com", password="password123@", is_driver=True
         )
-        self.url = reverse("account:forget_password")
+        cls.url = reverse("account:forget_password")
 
     def test_valid_data(self):
         data = {"email": "index@gmail.com"}
@@ -234,11 +241,12 @@ class ForgetPasswordTest(APITestCase):
 
 
 class VerifyForgetPasswordTest(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
             email="index@gmail.com", password="password123@", is_driver=True
         )
-        self.token = Token.objects.create(user=self.user)
+        cls.token = Token.objects.create(user=cls.user)
 
     def test_valid_token(self):
         url = reverse("account:vrify", args=[self.token.key])
@@ -257,14 +265,15 @@ class VerifyForgetPasswordTest(APITestCase):
 
 
 class DriverProfileViewTest(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
             email="index@gmail.com", password="password123@", is_driver=True
         )
-        self.token = Token.objects.create(user=self.user)
-        self.profile = DriverProfile.objects.get(user=self.user)
-        self.url = reverse("account:driverprofile")
-        self.headers = {"Authorization": f"Token {self.token.key}"}
+        cls.token = Token.objects.create(user=cls.user)
+        cls.profile = DriverProfile.objects.get(user=cls.user)
+        cls.url = reverse("account:driverprofile")
+        cls.headers = {"Authorization": f"Token {cls.token.key}"}
 
     def test_show_profile(self):
         response = self.client.get(self.url, headers=self.headers)

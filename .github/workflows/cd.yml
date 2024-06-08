@@ -1,18 +1,12 @@
 name: CD for bitaxi
 on:
-    pull_request:
+    push:
       branches:
         - main
   
 jobs:
-    quality-assurance:
-      name: check CI before deploy 
-      uses: ./.github/workflows/ci.yml
-
     simple_CD:
       name: Django CD
-      needs:
-        - quality-assurance
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v3
@@ -24,7 +18,7 @@ jobs:
           host: ${{secrets.SSH_HOST}}
           script: |
             cd bitaxi
-            docker compose -f docker-compose-dev.yaml down
+            docker compose -f docker-compose-prod.yaml down
             git pull
-            docker compose -f docker-compose-dev.yaml build
-            docker compose -f docker-compose-dev.yaml up -d --force-recreate
+            docker compose -f docker-compose-prod.yaml build
+            docker compose -f docker-compose-prod.yaml up -d --force-recreate

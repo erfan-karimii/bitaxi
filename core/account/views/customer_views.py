@@ -1,5 +1,4 @@
 import random 
-from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -20,7 +19,7 @@ from account.permissions import IsAuthenticatedCustomer
 from account.tasks import divide
 
 from utils.loggers import general_logger, error_logger
-from utils.emails import send_confirmation_email
+from utils.emails import send_confirmation_email , send_forget_password_email
 
 
 class CustomerLoginView(ObtainAuthToken):
@@ -69,7 +68,8 @@ class ResendEmailConfirm(APIView):
         user = get_object_or_404(User,email=email)
         if not user.is_verified:
             token = user.Token
-            send_confirmation_email(request,token,email)
+            host_name = request.get_host()
+            send_confirmation_email.delay(host_name,token,email)
             return Response(
             {"msg": f"Please check your email to confirm your email address"},
             status=status.HTTP_200_OK,
@@ -94,7 +94,8 @@ class RegisterCustomerView(APIView):
         password = serializer.validated_data.get("password")
         token = random.randint(1,100000)
         User.objects.create_user(email=email, password=password, is_customer=True,is_verified=False,Token=token)
-        send_confirmation_email(request,token,email)
+        host_name = request.get_host()
+        send_confirmation_email.delay(host_name,token,email)
 
         general_logger.info(f"user with {email} email address created")
         return Response(
@@ -133,18 +134,6 @@ class CustomerForgetPasswordView(APIView):
     class OutputSerializer(serializers.Serializer):
         msg = serializers.CharField(max_length=254)
 
-    @staticmethod
-    def send_forget_password_email(request, token, email):
-        # Our Emails content
-        host_name = request.get_host()
-        send_mail(
-            subject="forget password",
-            message=f"http://{host_name}/forget/{token}/",
-            from_email="admin@admin.com",
-            recipient_list=[email],
-            fail_silently=True,
-        )
-        general_logger.info(f"recovery email to {email} successfully")
 
     @extend_schema(request=InputSerializer,responses=OutputSerializer)
     def post(self, request):
@@ -154,7 +143,8 @@ class CustomerForgetPasswordView(APIView):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             token, created = Token.objects.get_or_create(user=user)
-            self.send_forget_password_email(request, token, email)
+            host_name = request.get_host()
+            send_forget_password_email.delay(host_name, token.key, email)
             return Response(
                 {"msg": "recovery email send successfully"}, status=status.HTTP_200_OK
             )
