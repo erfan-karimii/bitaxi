@@ -20,6 +20,9 @@ services:
     build:
       context: .
       dockerfile: docker/stage.Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 2
     entrypoint: /entrypoint.sh
     env_file:
       - db.env
