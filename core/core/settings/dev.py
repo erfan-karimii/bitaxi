@@ -3,4 +3,4 @@ from .base import *
 
 DEBUG = True
 
-INSTALLED_APPS += 'django_extensions'
+INSTALLED_APPS += ['django_extensions']
