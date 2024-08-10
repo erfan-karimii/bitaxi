@@ -96,7 +96,7 @@ class DriverProfileSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = DriverProfile
-        exclude = ["status", "id", "created_at", "updated_at", "user","count_trip"]
+        exclude = ["status", "id", "created_at", "updated_at", "user","count_trip",'cash_bank',]
         # fields = "__all__"
 
     def get_email(self, obj):
@@ -109,8 +109,9 @@ class DriverProfileSerializers(serializers.ModelSerializer):
         instance.cash_bank = validated_data.get("cash_bank", instance.cash_bank)
         instance.image = validated_data.get("image", instance.image)
         
+
         if validated_data.get("ID_image") is not None:
-            instance.ID_image = DriverProfile.compress_image(validated_data.get("ID_image"))        
+            instance.ID_image = DriverProfile.compress_image(validated_data.get("ID_image"))
             
          
         instance.car = validated_data.get("car", instance.car)

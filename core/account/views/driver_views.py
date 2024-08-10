@@ -13,7 +13,7 @@ from rest_framework import status, serializers
 from drf_spectacular.utils import extend_schema , inline_serializer
 from account.models import User, DriverProfile
 from account.permissions import IsDriver
-
+from django.core.mail import send_mail
 
 class DriverSignUP(APIView):
     class OutputRegisterSerializers(serializers.Serializer):
@@ -88,9 +88,17 @@ class ForgetPassword(APIView):
 
 
     @staticmethod
-    def send_email(token):
-        # Our Emails content
-        print(f"127.0.0.1:8000/custom/{token}/")
+    def active_send_email(email,token,host_name):
+        
+        email_content=f"/custom/{token}/"
+
+        send_mail(
+        subject="confirmation email",
+        message=f"http://{host_name}{email_content}",
+        from_email="admin@admin.com",
+        recipient_list=[email],
+        fail_silently=True,
+    )
 
     @extend_schema(request=ForgetPasswordSerializer,responses=OutputRegisterSerializers)
     def post(self, request):
@@ -100,7 +108,8 @@ class ForgetPassword(APIView):
 
             if User.objects.filter(email=email).exists():
                 user = User.objects.get(email=email)
-                token, created = Token.objects.get_or_create(user=user)
+                token, _ = Token.objects.get_or_create(user=user)
+                self.active_send_email(email,token,host_name=request.get_host())
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(
