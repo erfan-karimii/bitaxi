@@ -6,11 +6,11 @@ from .loggers import general_logger
 User =  get_user_model()
 
 @app.task
-def send_confirmation_email(host_name,token,email):
+def send_confirmation_email(host_name,url,email):
 
     send_mail(
         subject="confirmation email",
-        message=f"http://{host_name}/confirmation/{email}/{token}/",
+        message=f"http://{host_name}{url}",
         from_email="admin@admin.com",
         recipient_list=[email],
         fail_silently=True,
