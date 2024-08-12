@@ -48,7 +48,7 @@ customer_urlpatterns = [
         name="customer_forget_password",
     ),
     path(
-        "customer/password/verify/<str:token>/",
+        "customer/password/forget/verify/<str:token>/",
         CustomerVerifyForgetPasswordView.as_view(),
         name="customer_verify_password",
     ),
