@@ -183,6 +183,7 @@ class CustomerProfileView(APIView):
         msg = serializers.CharField(read_only=True)
 
 
+    @extend_schema(responses=CustomerProfileSerializers)
     def get(self, request):
         profile = CustomerProfile.objects.get(user=request.user)
         serializer = CustomerProfileSerializers(profile)
