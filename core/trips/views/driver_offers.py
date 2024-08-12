@@ -19,11 +19,12 @@ class DriverOfferViewForDriver(APIView):
     permission_classes = [
         IsDriver,
     ]
-
+    @extend_schema(request=DriverOfferSerializers,responses=DriverOfferSerializers)
     def post(self, request):
-        # check driver does not have many origin in same time
+        #FIXME: check driver does not have many origin in same time
         user_profile = DriverProfile.objects.get(user=request.user)
-        if user_profile.status == "No-travel":
+        # print(user_profile.status)
+        if (user_profile.status == "No-travel") or (user_profile.status == ""):
             serializer = DriverOfferSerializers(data=request.data)
             if serializer.is_valid():
                 serializer.create(
