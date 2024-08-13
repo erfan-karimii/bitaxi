@@ -28,11 +28,13 @@ class DiscountView(APIView):
     permission_classes = [IsSuperUser]
     serializer_class = DiscountSerializer
 
+    @extend_schema(responses=DiscountSerializer)
     def get(self, request):
         discounts = Discount.objects.all()
         serializer = self.serializer_class(discounts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(request=DiscountSerializer,responses=DiscountSerializer)
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -65,11 +67,13 @@ class DiscountDetailView(APIView):
     serializer_class = DiscountDetailSerializer
     permission_classes = [IsAuthenticatedCustomer]
 
+    @extend_schema(responses=DiscountDetailSerializer)
     def get(self, request, code):
         discount = get_object_or_404(Discount, code=code)
         if not discount.is_still_valid():
             raise serializers.ValidationError({"detail": "discount code expired"})
         serializer = self.serializer_class(discount)
+        serializer.is_valid(raise_exception=True)
         DiscountUserProfile.objects.create(
             customer_profile=request.user.customerprofile, discount=discount
         )
