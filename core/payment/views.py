@@ -193,4 +193,3 @@ class VerifyPaid(APIView):
                     }
                 )
         return Response(response)
-# se
