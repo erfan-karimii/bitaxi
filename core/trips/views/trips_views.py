@@ -53,6 +53,7 @@ class OrderTrips(APIView):
     def change_driver_status(driver: DriverProfile) -> None:
         DriverProfile.objects.filter(user=driver.user).update(status="traveling")
 
+    @extend_schema(request=InputTripSerializer)
     def post(self, request):
         customer = request.user.customerprofile
         serializer = InputTripSerializer(data=request.data)
@@ -100,7 +101,7 @@ class DriverTripsFinish(APIView):
         obj.count_trip = F('count_trip') + 1
         obj.save()
         
-
+    @extend_schema(request=DriverInputTripFinishSerializer)
     def patch(self, request):
         serializer = DriverInputTripFinishSerializer(data=request.data)
         if serializer.is_valid():

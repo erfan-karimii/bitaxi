@@ -86,6 +86,9 @@ class DetailDriverOffer(APIView):
 
     @extend_schema(responses=DriverShowForUserSerializer)
     def get(self, request, id):
-        offer = DriverOffers.objects.get(id=id, active=True)
-        serializer = self.OutPutListSerializer(offer)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        offer = DriverOffers.objects.filter(id=id, active=True).first()
+        if offer:
+            serializer = self.OutPutListSerializer(offer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'MSG':"You sent bad request"},status=status.HTTP_404_NOT_FOUND)
