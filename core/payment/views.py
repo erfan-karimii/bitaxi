@@ -73,7 +73,6 @@ class DiscountDetailView(APIView):
         if not discount.is_still_valid():
             raise serializers.ValidationError({"detail": "discount code expired"})
         serializer = self.serializer_class(discount)
-        serializer.is_valid(raise_exception=True)
         DiscountUserProfile.objects.create(
             customer_profile=request.user.customerprofile, discount=discount
         )
