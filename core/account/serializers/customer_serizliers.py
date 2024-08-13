@@ -8,7 +8,7 @@ from utils.loggers import error_logger
 
 
 class CustomAuthTokenSerializer(serializers.Serializer):
-    email = serializers.CharField(
+    email = serializers.EmailField(
         label=_("Email"),
     )
     password = serializers.CharField(

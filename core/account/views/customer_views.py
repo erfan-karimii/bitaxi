@@ -1,5 +1,6 @@
 import random 
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -69,7 +70,8 @@ class ResendEmailConfirm(APIView):
         if not user.is_verified:
             token = user.Token
             host_name = request.get_host()
-            send_confirmation_email.delay(host_name,token,email)
+            url = reverse(viewname="account:confirm_email",kwargs={"token":token,"email":email})
+            send_confirmation_email.delay(host_name,url,email)
             return Response(
             {"msg": f"Please check your email to confirm your email address"},
             status=status.HTTP_200_OK,
@@ -95,7 +97,8 @@ class RegisterCustomerView(APIView):
         token = random.randint(1,100000)
         User.objects.create_user(email=email, password=password, is_customer=True,is_verified=False,Token=token)
         host_name = request.get_host()
-        send_confirmation_email.delay(host_name,token,email)
+        url = reverse(viewname="account:confirm_email",kwargs={"token":token,"email":email})
+        send_confirmation_email.delay(host_name,url,email)
 
         general_logger.info(f"user with {email} email address created")
         return Response(
@@ -180,6 +183,7 @@ class CustomerProfileView(APIView):
         msg = serializers.CharField(read_only=True)
 
 
+    @extend_schema(responses=CustomerProfileSerializers)
     def get(self, request):
         profile = CustomerProfile.objects.get(user=request.user)
         serializer = CustomerProfileSerializers(profile)

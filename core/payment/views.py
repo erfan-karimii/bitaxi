@@ -28,11 +28,13 @@ class DiscountView(APIView):
     permission_classes = [IsSuperUser]
     serializer_class = DiscountSerializer
 
+    @extend_schema(responses=DiscountSerializer)
     def get(self, request):
         discounts = Discount.objects.all()
         serializer = self.serializer_class(discounts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(request=DiscountSerializer,responses=DiscountSerializer)
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -65,6 +67,7 @@ class DiscountDetailView(APIView):
     serializer_class = DiscountDetailSerializer
     permission_classes = [IsAuthenticatedCustomer]
 
+    @extend_schema(responses=DiscountDetailSerializer)
     def get(self, request, code):
         discount = get_object_or_404(Discount, code=code)
         if not discount.is_still_valid():
@@ -78,13 +81,20 @@ class DiscountDetailView(APIView):
 
 class Paid(APIView):
     permission_classes = [IsAuthenticatedCustomer]
+    class OutputSerializers(serializers.Serializer):
+        status = serializers.BooleanField()
+        url = serializers.URLField()
+        authority = serializers.CharField(max_length=30)
+        
 
+    @extend_schema(responses=PaidTripSerializer)
     def get(self, request):
         user = request.user
         trips = Trips.objects.filter(customer=user.customerprofile, is_paid=False)
         serializer = PaidTripSerializer(trips, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(responses=OutputSerializers)
     def post(self, request):
         trips = Trips.objects.filter(
             customer=request.user.customerprofile, is_paid=False
@@ -127,6 +137,7 @@ class Paid(APIView):
 
 
 class VerifyPaid(APIView):
+    permission_classes = [IsAuthenticatedCustomer]
     @staticmethod
     def paid_trips(trips):
         trips.update(is_paid=True)
@@ -139,7 +150,15 @@ class VerifyPaid(APIView):
         trips_id = trips.values_list("id",flat=True)
         PayMentLog.objects.create(user=user,cost=cost,day=timezone.now().date(),time=timezone.now().time(),status="INCREASE",
                                   message=f"charge {cost} for {trips_count} trips and trips id {trips_id} ")
+    
+    
+    class OutputVerifyPaidSerializers(serializers.Serializer):
+        status = serializers.BooleanField()
+        RefID = serializers.CharField(max_length=30)
+        message = serializers.CharField()
+        
 
+    @extend_schema(responses=OutputVerifyPaidSerializers)
     def get(self, request):
         trips = Trips.objects.filter(
             customer=request.user.customerprofile, is_paid=False
@@ -148,7 +167,7 @@ class VerifyPaid(APIView):
         data = {
             "MerchantID": settings.MERCHANT,
             "Amount": cost["cost__sum"],
-            "Authority": request.GET["Authority"],
+            "Authority": request.GET.get("Authority",""),
         }
 
         data = json.dumps(data)
@@ -177,4 +196,3 @@ class VerifyPaid(APIView):
                     }
                 )
         return Response(response)
-# se
