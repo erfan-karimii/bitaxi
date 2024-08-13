@@ -134,7 +134,7 @@ class Paid(APIView):
 
 
 class VerifyPaid(APIView):
-    
+    permission_classes = [IsAuthenticatedCustomer]
     @staticmethod
     def paid_trips(trips):
         trips.update(is_paid=True)
@@ -164,7 +164,7 @@ class VerifyPaid(APIView):
         data = {
             "MerchantID": settings.MERCHANT,
             "Amount": cost["cost__sum"],
-            "Authority": request.GET["Authority"],
+            "Authority": request.GET.get("Authority",""),
         }
 
         data = json.dumps(data)
