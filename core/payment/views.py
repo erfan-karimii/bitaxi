@@ -79,6 +79,7 @@ class DiscountDetailView(APIView):
 class Paid(APIView):
     permission_classes = [IsAuthenticatedCustomer]
 
+    @extend_schema(responses=PaidTripSerializer)
     def get(self, request):
         user = request.user
         trips = Trips.objects.filter(customer=user.customerprofile, is_paid=False)
